@@ -48,9 +48,10 @@ type Config struct {
 
 // ServerConfig holds server configuration
 type ServerConfig struct {
-	Host string `mapstructure:"host"`
-	Port int    `mapstructure:"port"`
-	Mode string `mapstructure:"mode"` // development, production
+	Host           string   `mapstructure:"host"`
+	Port           int      `mapstructure:"port"`
+	Mode           string   `mapstructure:"mode"` // development, production
+	AllowedOrigins []string `mapstructure:"allowed_origins"`
 }
 
 // LogConfig holds logging configuration
@@ -282,6 +283,18 @@ func (app *App) initFiber() {
 	
 	// 10. Input validation middleware for all routes
 	app.fiber.Use(middleware.ValidateInput())
+	
+	// 11. SQL injection protection
+	app.fiber.Use(middleware.SQLSecurityMiddleware())
+	
+	// 12. CSRF protection
+	app.fiber.Use(middleware.CSRFProtection())
+	
+	// 13. Configuration security
+	app.fiber.Use(middleware.ConfigSecurityMiddleware())
+	
+	// 14. Secure logging (prevents sensitive data leakage)
+	app.fiber.Use(middleware.SecureLoggingMiddleware())
 
 	zlog.Info().Msg("Fiber application initialized")
 }

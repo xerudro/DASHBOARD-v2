@@ -17,6 +17,12 @@ server:
   
   # Max request body size (for uploads)
   max_body_size: "100MB"
+  
+  # Allowed CORS origins
+  allowed_origins:
+    - "https://panel.example.com"
+    - "https://localhost:3000"
+    - "https://127.0.0.1:3000"
 
 database:
   # PostgreSQL connection
@@ -46,8 +52,20 @@ redis:
   min_idle_conns: 5
 
 jwt:
-  # JWT secret key (CHANGE THIS IN PRODUCTION!)
-  secret: "change-this-to-a-random-secret-key-in-production"
+  # JWT secret key (MUST BE CHANGED IN PRODUCTION!)
+  # Generate with: openssl rand -base64 64
+  secret: "${JWT_SECRET_KEY}"
+  
+  # JWT expiration times
+  access_token_ttl: "15m"      # 15 minutes
+  refresh_token_ttl: "7d"      # 7 days
+  
+  # JWT issuer and audience
+  issuer: "vip-hosting-panel"
+  audience: "panel-users"
+  
+  # Algorithm (HS256, HS384, HS512, RS256, etc.)
+  algorithm: "HS256"
   
   # Token expiration
   expiration: "24h"
@@ -369,7 +387,9 @@ api:
   cors:
     enabled: true
     allowed_origins:
-      - "*"
+      - "https://panel.example.com"
+      - "https://localhost:3000"
+      - "https://127.0.0.1:3000"
     allowed_methods:
       - "GET"
       - "POST"

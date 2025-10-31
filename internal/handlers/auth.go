@@ -96,7 +96,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Hash password to compare
 	passwordHash, err := auth.HashPassword(req.Password)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to hash password for comparison")
+		log.Error().Err(err).Msg("Failed to hash provided credentials for comparison")
 		return c.Status(fiber.StatusInternalServerError).JSON(LoginResponse{
 			Success: false,
 			Message: "Authentication failed",
@@ -122,7 +122,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 			Str("email", req.Email).
 			Str("user_id", user.ID.String()).
 			Str("ip", c.IP()).
-			Msg("Login attempt with invalid password")
+			Msg("Login attempt with invalid credentials")
 		return c.Status(fiber.StatusUnauthorized).JSON(LoginResponse{
 			Success: false,
 			Message: "Invalid credentials",
@@ -221,7 +221,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Hash password
 	passwordHash, err := auth.HashPassword(req.Password)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to hash password")
+		log.Error().Err(err).Msg("Failed to hash user credentials")
 		return c.Status(fiber.StatusInternalServerError).JSON(LoginResponse{
 			Success: false,
 			Message: "Registration failed",
@@ -500,7 +500,7 @@ func (h *AuthHandler) RegisterForm(c *fiber.Ctx) error {
 	// Hash password
 	passwordHash, err := auth.HashPassword(password)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to hash password")
+		log.Error().Err(err).Msg("Failed to hash user credentials")
 		return c.Redirect("/register?error=registration_failed")
 	}
 
