@@ -19,12 +19,12 @@ import (
 	zlog "github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 
-	"github.com/vip-hosting/panel-v2/internal/database"
-	"github.com/vip-hosting/panel-v2/internal/handlers"
-	"github.com/vip-hosting/panel-v2/internal/middleware"
-	"github.com/vip-hosting/panel-v2/internal/monitoring"
-	"github.com/vip-hosting/panel-v2/internal/repository"
-	"github.com/vip-hosting/panel-v2/internal/services"
+	"github.com/xerudro/DASHBOARD-v2/internal/database"
+	"github.com/xerudro/DASHBOARD-v2/internal/handlers"
+	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
+	"github.com/xerudro/DASHBOARD-v2/internal/monitoring"
+	"github.com/xerudro/DASHBOARD-v2/internal/repository"
+	"github.com/xerudro/DASHBOARD-v2/internal/services"
 )
 
 // App holds the application dependencies

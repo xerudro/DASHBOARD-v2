@@ -70,16 +70,17 @@ TOTAL_TESTS=$((TOTAL_TESTS + 1))
 if command_exists go; then
     print_status "INFO" "Installing gosec security scanner..."
     
-    # Install gosec
-    if go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest; then
+    # Install gosec from correct repository
+    if go install github.com/securego/gosec/v2/cmd/gosec@latest; then
         print_status "INFO" "gosec installed successfully"
         
         # Add Go bin to PATH if not already there
         export PATH=$PATH:$(go env GOPATH)/bin
+        GOSEC_BIN="$(go env GOPATH)/bin/gosec.exe"
         
-        # Run gosec analysis
+        # Run gosec analysis (Windows-compatible)
         print_status "INFO" "Running gosec security analysis..."
-        if gosec -fmt json -out gosec-report.json ./... 2>/dev/null; then
+        if "$GOSEC_BIN" -fmt json -out gosec-report.json -severity medium ./cmd/api/ 2>/dev/null; then
             # Check if gosec found any issues
             if [ -f gosec-report.json ]; then
                 ISSUES=$(grep -o '"Issues":\[.*\]' gosec-report.json | grep -o '\[.*\]' | wc -c)

@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
-	"github.com/vip-hosting/panel-v2/internal/middleware"
-	"github.com/vip-hosting/panel-v2/internal/repository"
+	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
+	"github.com/xerudro/DASHBOARD-v2/internal/repository"
 )
 
 // UserHandler handles user management endpoints

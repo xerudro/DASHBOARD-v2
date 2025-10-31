@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	"github.com/vip-hosting/panel-v2/internal/models"
+	"github.com/xerudro/DASHBOARD-v2/internal/models"
 )
 
 // UserRepository handles user database operations

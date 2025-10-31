@@ -1,0 +1,19 @@
+{
+	"Golang errors": {
+		"cmd/simple/main.go": [
+			{
+				"line": 0,
+				"column": 0,
+				"error": "importing dir \"cmd/simple/main.go\": cannot find package \".\" in:\n\tcmd\\simple\\main.go"
+			}
+		]
+	},
+	"Issues": [],
+	"Stats": {
+		"files": 0,
+		"lines": 0,
+		"nosec": 0,
+		"found": 0
+	},
+	"GosecVersion": "dev"
+}

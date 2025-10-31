@@ -1,4 +1,4 @@
-module github.com/vip-hosting/panel-v2
+module github.com/xerudro/DASHBOARD-v2
 
 go 1.21
 

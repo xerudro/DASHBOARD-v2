@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/vip-hosting/panel-v2/internal/models"
+	"github.com/xerudro/DASHBOARD-v2/internal/models"
 )
 
 // JWTClaims represents JWT token claims
