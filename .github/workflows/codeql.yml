@@ -1,0 +1,177 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  schedule:
+    # Run weekly on Monday at 16:44 UTC
+    - cron: '44 16 * * 1'
+  # Allow manual workflow dispatch
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: 360
+    permissions:
+      # Required for all workflows
+      security-events: write
+      # Required to fetch internal or private CodeQL packs
+      packages: read
+      # Required for workflows in private repositories
+      actions: read
+      contents: read
+      # Required for pulling code
+      pull-requests: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Add your languages here - examples:
+          - language: javascript-typescript
+            build-mode: none
+          - language: python
+            build-mode: none
+          # Uncomment and configure for compiled languages:
+          # - language: java-kotlin
+          #   build-mode: none  # or 'manual' if autobuild fails
+          # - language: c-cpp
+          #   build-mode: manual
+          # - language: csharp
+          #   build-mode: none
+          # - language: go
+          #   build-mode: autobuild
+          # - language: ruby
+          #   build-mode: none
+          # - language: rust
+          #   build-mode: manual
+          # - language: swift
+          #   build-mode: manual
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # Fetch full history for better analysis
+        fetch-depth: 0
+
+    # Setup steps for specific languages (uncomment as needed)
+    # - name: Setup Node.js
+    #   if: matrix.language == 'javascript-typescript'
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: '20'
+    #     cache: 'npm'
+    
+    # - name: Setup Python
+    #   if: matrix.language == 'python'
+    #   uses: actions/setup-python@v5
+    #   with:
+    #     python-version: '3.11'
+    #     cache: 'pip'
+    
+    # - name: Setup Java
+    #   if: matrix.language == 'java-kotlin'
+    #   uses: actions/setup-java@v4
+    #   with:
+    #     distribution: 'temurin'
+    #     java-version: '17'
+    
+    # - name: Setup Go
+    #   if: matrix.language == 'go'
+    #   uses: actions/setup-go@v5
+    #   with:
+    #     go-version: '1.21'
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+        # Enable security-and-quality query suite for comprehensive analysis
+        queries: security-and-quality
+        # Optional: Add custom query packs
+        # packs: |
+        #   codeql/javascript-queries
+        #   codeql/python-queries
+        
+        # Optional: Specify config file for advanced customization
+        # config-file: ./.github/codeql/codeql-config.yml
+        
+        # Configure source root (if non-standard)
+        # source-root: src
+        
+        # Debug mode (uncomment for troubleshooting)
+        # debug: true
+
+    # Manual build steps for compiled languages
+    - name: Build project
+      if: matrix.build-mode == 'manual'
+      shell: bash
+      run: |
+        # Replace these commands with your actual build steps
+        # Examples:
+        
+        # For C/C++:
+        # make clean && make
+        
+        # For Java/Maven:
+        # mvn clean compile -DskipTests
+        
+        # For Java/Gradle:
+        # ./gradlew clean build -x test
+        
+        # For C#/.NET:
+        # dotnet build --configuration Release
+        
+        # For Rust:
+        # cargo build --release
+        
+        # For Swift:
+        # swift build
+        
+        echo "Error: Manual build mode requires configuration"
+        echo "Please replace this step with your actual build commands"
+        exit 1
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{ matrix.language }}"
+        # Upload SARIF even if there are no results
+        upload: always
+        # Optional: Fail the workflow if vulnerabilities are found
+        # fail-on-error: true
+        
+        # Optional: Filter out specific paths from analysis results
+        # output: results-${{ matrix.language }}.sarif
+        
+        # Optional: Add baseline to track new issues only
+        # baseline-sarif-file: baseline-${{ matrix.language }}.sarif
+
+    # Optional: Upload results as artifacts for review
+    - name: Upload CodeQL results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: codeql-results-${{ matrix.language }}
+        path: /home/runner/work/_temp/codeql_databases/
+        retention-days: 7
+
+    # Optional: Create issue if high severity vulnerabilities found
+    # - name: Create issue on failure
+    #   if: failure()
+    #   uses: actions/github-script@v7
+    #   with:
+    #     script: |
+    #       github.rest.issues.create({
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         title: 'CodeQL found security issues in ${{ matrix.language }}',
+    #         body: 'CodeQL analysis detected potential security vulnerabilities. Please review the Security tab.',
+    #         labels: ['security', 'codeql']
+    #       })
