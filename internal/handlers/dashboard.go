@@ -9,9 +9,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
-	"github.com/vip-hosting-panel/internal/middleware"
-	"github.com/vip-hosting-panel/internal/models"
-	"github.com/vip-hosting-panel/internal/repository"
+	"github.com/vip-hosting/panel-v2/internal/middleware"
+	"github.com/vip-hosting/panel-v2/internal/models"
+	"github.com/vip-hosting/panel-v2/internal/repository"
 )
 
 // DashboardHandler handles dashboard endpoints

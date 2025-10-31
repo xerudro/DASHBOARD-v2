@@ -19,12 +19,12 @@ import (
 	zlog "github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 
-	"github.com/vip-hosting-panel/internal/database"
-	"github.com/vip-hosting-panel/internal/handlers"
-	"github.com/vip-hosting-panel/internal/middleware"
-	"github.com/vip-hosting-panel/internal/monitoring"
-	"github.com/vip-hosting-panel/internal/repository"
-	"github.com/vip-hosting-panel/internal/services"
+	"github.com/vip-hosting/panel-v2/internal/database"
+	"github.com/vip-hosting/panel-v2/internal/handlers"
+	"github.com/vip-hosting/panel-v2/internal/middleware"
+	"github.com/vip-hosting/panel-v2/internal/monitoring"
+	"github.com/vip-hosting/panel-v2/internal/repository"
+	"github.com/vip-hosting/panel-v2/internal/services"
 )
 
 // App holds the application dependencies

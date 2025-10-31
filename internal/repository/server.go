@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	"github.com/vip-hosting-panel/internal/models"
+	"github.com/vip-hosting/panel-v2/internal/models"
 )
 
 // ServerRepository handles server database operations
