@@ -4,30 +4,30 @@ go 1.21
 
 require (
 	github.com/a-h/templ v0.2.543
-	github.com/cloudflare/cloudflare-go v0.86.0
-	github.com/digitalocean/godo v1.108.0
-	github.com/go-acme/lego/v4 v4.15.0
-	github.com/go-playground/validator/v10 v10.16.0
-	github.com/go-redis/redis/v8 v8.11.5
-	github.com/gofiber/contrib/websocket v1.3.0
 	github.com/gofiber/fiber/v2 v2.52.0
+	github.com/gofiber/contrib/websocket v1.3.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
-	github.com/google/uuid v1.5.0
-	github.com/hetznercloud/hcloud-go/v2 v2.6.0
 	github.com/hibiken/asynq v0.24.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.9
-	github.com/miekg/dns v1.1.58
-	github.com/pquerna/otp v1.4.0
-	github.com/prometheus/client_golang v1.18.0
-	github.com/robfig/cron/v3 v3.0.1
-	github.com/rs/zerolog v1.31.0
-	github.com/segmentio/ksuid v1.0.4
-	github.com/shirou/gopsutil/v3 v3.24.1
-	github.com/spf13/viper v1.18.2
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/stripe/stripe-go/v76 v76.12.0
+	github.com/cloudflare/cloudflare-go v0.86.0
+	github.com/hetznercloud/hcloud-go/v2 v2.6.0
+	github.com/digitalocean/godo v1.108.0
+	github.com/go-playground/validator/v10 v10.16.0
+	github.com/spf13/viper v1.18.2
+	github.com/pquerna/otp v1.4.0
 	golang.org/x/crypto v0.18.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	github.com/miekg/dns v1.1.57
+	github.com/go-acme/lego/v4 v4.15.0
+	github.com/robfig/cron/v3 v3.0.1
+	github.com/shirou/gopsutil/v3 v3.24.1
+	github.com/rs/zerolog v1.31.0
+	github.com/prometheus/client_golang v1.18.0
+	github.com/segmentio/ksuid v1.0.4
+	github.com/google/uuid v1.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
