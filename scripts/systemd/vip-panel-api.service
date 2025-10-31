@@ -1,0 +1,42 @@
+[Unit]
+Description=VIP Hosting Panel API Server
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=vip-panel
+Group=vip-panel
+
+# Working directory
+WorkingDirectory=/opt/vip-panel
+
+# Environment
+Environment="VIP_ENV=production"
+Environment="VIP_CONFIG=/etc/vip-panel/config.yaml"
+
+# Binary path
+ExecStart=/opt/vip-panel/vip-panel-api
+
+# Restart policy
+Restart=always
+RestartSec=5s
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/vip-panel /var/lib/vip-panel
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vip-panel-api
+
+[Install]
+WantedBy=multi-user.target

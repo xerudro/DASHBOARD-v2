@@ -1,0 +1,118 @@
+package pages
+
+import (
+	"github.com/vip-hosting/panel-v2/web/templates/layouts"
+	"github.com/vip-hosting/panel-v2/web/templates/components"
+	"github.com/vip-hosting/panel-v2/internal/models"
+	"fmt"
+)
+
+type DashboardData struct {
+	VPSServers      int
+	VPSActive       int
+	Clients         int
+	Domains         int
+	ActiveServices  int
+	SystemStatus    SystemStatus
+}
+
+type SystemStatus struct {
+	VPSServices bool
+	Database    bool
+	Security    bool
+}
+
+templ Dashboard(user *models.User, data DashboardData) {
+	@layouts.Base(user, "Administrator Control Panel") {
+		<!-- Page Header -->
+		<div class="mb-8">
+			<h1 class="text-3xl font-bold text-white mb-2">Administrator Control Panel</h1>
+			<p class="text-gray-400">Manage servers, clients, and hosting infrastructure</p>
+		</div>
+		
+		<!-- Stats Cards Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+			@StatCard("VPS Servers", fmt.Sprintf("%d", data.VPSServers), fmt.Sprintf("%d active", data.VPSActive), "server", "text-blue-500")
+			@StatCard("Clients", fmt.Sprintf("%d", data.Clients), "Total clients", "users", "text-purple-500")
+			@StatCard("Domains", fmt.Sprintf("%d", data.Domains), "Managed domains", "globe", "text-green-500")
+			@StatCard("Active Services", fmt.Sprintf("%d", data.ActiveServices), "Running subscriptions", "activity", "text-orange-500")
+		</div>
+		
+		<!-- Quick Actions -->
+		<div class="card mb-8">
+			<div class="card-header">
+				<h2 class="card-title">Quick Actions</h2>
+			</div>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+				@QuickActionButton("/clients/add", "plus", "Add Client", "Create a new client account")
+				@QuickActionButton("/vps/create", "server", "Create VPS", "Provision a new VPS instance")
+				@QuickActionButton("/domains/register", "globe", "Register Domain", "Register a new domain name")
+				@QuickActionButton("/email/settings", "mail", "Email Settings", "Configure email accounts")
+			</div>
+		</div>
+		
+		<!-- System Status -->
+		<div class="card">
+			<div class="card-header">
+				<h2 class="card-title">System Status</h2>
+			</div>
+			
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				@SystemStatusItem("VPS Services", data.SystemStatus.VPSServices, "All VPS services running normally")
+				@SystemStatusItem("Database", data.SystemStatus.Database, "Database connections healthy")
+				@SystemStatusItem("Security", data.SystemStatus.Security, "Security systems operational")
+			</div>
+		</div>
+	}
+}
+
+templ StatCard(label string, value string, subtitle string, icon string, iconColor string) {
+	<div class="stat-card">
+		<div class="flex items-start justify-between">
+			<div class="flex-1">
+				<p class="stat-label">{ label }</p>
+				<p class="stat-value mt-2">{ value }</p>
+				<p class="text-sm text-gray-500 mt-1">{ subtitle }</p>
+			</div>
+			<div class={ "p-3 rounded-lg bg-dark-700", iconColor }>
+				<i data-lucide={ icon } class="w-6 h-6"></i>
+			</div>
+		</div>
+	</div>
+}
+
+templ QuickActionButton(href string, icon string, title string, description string) {
+	<a 
+		href={ templ.SafeURL(href) }
+		class="flex items-start gap-4 p-4 rounded-lg border border-dark-700 hover:border-primary-500 hover:bg-dark-700/50 transition-all duration-200 group"
+	>
+		<div class="p-2 rounded-lg bg-dark-700 group-hover:bg-primary-500 transition-colors">
+			<i data-lucide={ icon } class="w-5 h-5 text-gray-400 group-hover:text-white"></i>
+		</div>
+		<div class="flex-1">
+			<h3 class="text-sm font-medium text-white mb-1">{ title }</h3>
+			<p class="text-xs text-gray-500">{ description }</p>
+		</div>
+	</a>
+}
+
+templ SystemStatusItem(label string, online bool, description string) {
+	<div class="flex items-center gap-4">
+		if online {
+			<div class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-500 rounded-lg">
+				<div class="status-online"></div>
+				<span class="text-sm font-medium">Online</span>
+			</div>
+		} else {
+			<div class="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-500 rounded-lg">
+				<div class="status-offline"></div>
+				<span class="text-sm font-medium">Offline</span>
+			</div>
+		}
+		<div class="flex-1">
+			<p class="text-sm font-medium text-white">{ label }</p>
+			<p class="text-xs text-gray-500">{ description }</p>
+		</div>
+	</div>
+}

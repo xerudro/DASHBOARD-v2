@@ -1,0 +1,30 @@
+{
+  "name": "vip-hosting-panel-v2",
+  "version": "2.0.0",
+  "description": "Modern hosting control panel built with Go, HTMX, and Tailwind CSS",
+  "scripts": {
+    "build:css": "tailwindcss -i ./web/static/css/input.css -o ./web/static/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./web/static/css/input.css -o ./web/static/css/output.css --watch",
+    "dev": "npm run watch:css"
+  },
+  "keywords": [
+    "hosting",
+    "control-panel",
+    "htmx",
+    "tailwindcss",
+    "go"
+  ],
+  "author": "VIP Hosting Panel Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
+  },
+  "dependencies": {
+    "alpinejs": "^3.13.3",
+    "htmx.org": "^1.9.10"
+  }
+}

@@ -1,0 +1,396 @@
+# VIP Hosting Panel - Main Configuration
+
+server:
+  # Server host and port
+  host: "0.0.0.0"
+  port: 3000
+  
+  # Server domain (used for email links, etc)
+  domain: "panel.example.com"
+  
+  # Enable HTTPS (when behind reverse proxy)
+  secure: false
+  
+  # Read/Write timeouts
+  read_timeout: 30s
+  write_timeout: 30s
+  
+  # Max request body size (for uploads)
+  max_body_size: "100MB"
+
+database:
+  # PostgreSQL connection
+  host: "localhost"
+  port: 5432
+  name: "vip_hosting"
+  user: "vip_panel"
+  password: "postgres"
+  
+  # Connection pool
+  max_connections: 100
+  max_idle_connections: 10
+  max_lifetime: "1h"
+  
+  # SSL mode: disable, require, verify-ca, verify-full
+  ssl_mode: "disable"
+
+redis:
+  # Redis connection
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+  
+  # Connection pool
+  pool_size: 10
+  min_idle_conns: 5
+
+jwt:
+  # JWT secret key (CHANGE THIS IN PRODUCTION!)
+  secret: "change-this-to-a-random-secret-key-in-production"
+  
+  # Token expiration
+  expiration: "24h"
+  refresh_expiration: "168h"  # 7 days
+
+session:
+  # Session configuration
+  name: "vip_session"
+  secret: "change-this-session-secret"
+  expiration: "24h"
+  secure: false  # Set to true when using HTTPS
+
+# Feature flags
+features:
+  # Enable/disable features
+  multi_php: true
+  multi_nodejs: true
+  multi_database: true
+  multi_webserver: true
+  email_server: true
+  webmail: true
+  dns_management: true
+  waf: true
+  antivirus: true
+  fail2ban: true
+  firewall_manager: true
+  git_deployment: true
+  ssl_management: true
+  backup_system: true
+  monitoring: true
+  billing: true
+  reseller_mode: true
+  two_factor_auth: true
+
+# PHP versions available
+php:
+  versions:
+    - "5.6"
+    - "7.0"
+    - "7.1"
+    - "7.2"
+    - "7.3"
+    - "7.4"
+    - "8.0"
+    - "8.1"
+    - "8.2"
+    - "8.3"
+  default: "8.2"
+
+# Node.js versions available
+nodejs:
+  versions:
+    - "14"
+    - "16"
+    - "18"
+    - "20"
+    - "21"
+  default: "20"
+
+# Web server options
+webserver:
+  # Available: nginx, apache, litespeed, caddy
+  options:
+    - "nginx"
+    - "apache"
+  default: "nginx"
+
+# Database types supported
+database_types:
+  mysql:
+    enabled: true
+    versions: ["5.7", "8.0"]
+    default: "8.0"
+  
+  postgresql:
+    enabled: true
+    versions: ["12", "13", "14", "15", "16"]
+    default: "15"
+  
+  mongodb:
+    enabled: true
+    versions: ["4.4", "5.0", "6.0", "7.0"]
+    default: "7.0"
+  
+  redis:
+    enabled: true
+    versions: ["6", "7"]
+    default: "7"
+
+# Email server configuration
+email:
+  smtp:
+    host: "mail.example.com"
+    port: 587
+    username: "noreply@example.com"
+    password: "password"
+    from_name: "VIP Hosting Panel"
+    from_address: "noreply@example.com"
+  
+  # Webmail options: roundcube, snappymail
+  webmail: "roundcube"
+  
+  # Anti-spam
+  spamassassin:
+    enabled: true
+    score_threshold: 5.0
+
+# SSL/TLS configuration
+ssl:
+  # Let's Encrypt settings
+  letsencrypt:
+    enabled: true
+    email: "admin@example.com"
+    staging: false  # Use staging for testing
+  
+  # Auto-renewal
+  auto_renew: true
+  renew_days_before: 30
+
+# Security settings
+security:
+  # Web Application Firewall
+  waf:
+    enabled: true
+    mode: "block"  # detect or block
+    rules:
+      - "owasp-crs"
+  
+  # Antivirus
+  clamav:
+    enabled: true
+    scan_uploads: true
+    quarantine_infected: true
+  
+  # Fail2ban
+  fail2ban:
+    enabled: true
+    max_retry: 5
+    ban_time: "10m"
+    find_time: "10m"
+  
+  # Firewall
+  firewall:
+    enabled: true
+    default_policy: "deny"
+    allowed_ports:
+      - 22   # SSH
+      - 80   # HTTP
+      - 443  # HTTPS
+      - 25   # SMTP
+      - 587  # SMTP Submission
+      - 465  # SMTPS
+      - 143  # IMAP
+      - 993  # IMAPS
+      - 110  # POP3
+      - 995  # POP3S
+
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+    burst: 10
+
+  # Password policy
+  password:
+    min_length: 12
+    require_uppercase: true
+    require_lowercase: true
+    require_numbers: true
+    require_special: true
+
+# Backup configuration
+backup:
+  # Backup schedule (cron format)
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  
+  # Retention policy
+  retention:
+    daily: 7
+    weekly: 4
+    monthly: 3
+  
+  # Compression
+  compression: true
+  compression_level: 6
+  
+  # Encryption
+  encryption: true
+  encryption_key: "change-this-encryption-key"
+
+# Monitoring configuration
+monitoring:
+  # Metrics collection interval
+  interval: 60s
+  
+  # Retention period
+  retention: "30d"
+  
+  # Alert thresholds
+  alerts:
+    cpu:
+      warning: 70
+      critical: 90
+    memory:
+      warning: 80
+      critical: 95
+    disk:
+      warning: 85
+      critical: 95
+    load:
+      warning: 5.0
+      critical: 10.0
+
+# Logging configuration
+logging:
+  # Log level: debug, info, warn, error
+  level: "info"
+  
+  # Log format: json, text
+  format: "json"
+  
+  # Log output: stdout, file, both
+  output: "both"
+  
+  # File logging
+  file:
+    path: "/var/log/vip-panel/app.log"
+    max_size: "100MB"
+    max_age: "30d"
+    max_backups: 10
+    compress: true
+
+# Worker configuration
+worker:
+  # Number of concurrent workers
+  concurrency: 10
+  
+  # Queue names
+  queues:
+    high: 5
+    default: 3
+    low: 2
+  
+  # Job retry policy
+  max_retry: 3
+  retry_delay: "5m"
+
+# Paths
+paths:
+  # Installation paths
+  install: "/opt/vip-panel"
+  config: "/etc/vip-panel"
+  data: "/var/lib/vip-panel"
+  logs: "/var/log/vip-panel"
+  
+  # Server paths (for managed servers)
+  web_root: "/var/www"
+  php_fpm: "/etc/php"
+  nginx: "/etc/nginx"
+  apache: "/etc/apache2"
+  mysql: "/etc/mysql"
+  postgresql: "/etc/postgresql"
+  
+  # Backup path
+  backups: "/var/lib/vip-panel/backups"
+  
+  # Temporary path
+  temp: "/tmp/vip-panel"
+
+# Default resource limits
+limits:
+  # Per site limits
+  site:
+    disk: "10GB"
+    bandwidth: "100GB"
+    inodes: 100000
+    databases: 10
+    email_accounts: 50
+  
+  # Per database limits
+  database:
+    size: "1GB"
+    connections: 100
+  
+  # Per email account limits
+  email:
+    quota: "1GB"
+    messages_per_hour: 100
+
+# Notification settings
+notifications:
+  # Notification channels
+  channels:
+    - "email"
+    - "webhook"
+  
+  # Events to notify
+  events:
+    - "server.created"
+    - "server.failed"
+    - "site.deployed"
+    - "ssl.renewed"
+    - "ssl.failed"
+    - "backup.completed"
+    - "backup.failed"
+    - "alert.triggered"
+    - "payment.received"
+    - "payment.failed"
+
+# API settings
+api:
+  # API version
+  version: "v1"
+  
+  # API documentation
+  docs_enabled: true
+  
+  # CORS settings
+  cors:
+    enabled: true
+    allowed_origins:
+      - "*"
+    allowed_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "PATCH"
+    allowed_headers:
+      - "Content-Type"
+      - "Authorization"
+    max_age: "12h"
+
+# Development settings (only for development environment)
+development:
+  # Enable debug mode
+  debug: false
+  
+  # Hot reload
+  hot_reload: false
+  
+  # Seed database
+  seed_database: false
+  
+  # Mock external services
+  mock_services: false

@@ -8,17 +8,25 @@ VIP Hosting Panel is a modern, multi-tenant web hosting control panel that centr
 ## Architecture & Technology Stack
 
 ### Backend (Go)
-- **Framework**: Fiber (fast HTTP framework)
-- **Language**: Go 1.21+
-- **Authentication**: JWT with RBAC, 2FA (TOTP), optional SSO/OIDC
-- **Job Queue**: Asynq (Redis-based) for async provisioning, backups, SSL renewal
-- **Template Engine**: Templ (type-safe Go templates)
+- **Framework**: Fiber v2.52.0 (fast HTTP framework) with WebSocket support
+- **Language**: Go 1.21+ (as defined in go.mod)
+- **Authentication**: JWT (golang-jwt/jwt v5.2.0) with RBAC, 2FA (pquerna/otp v1.4.0)
+- **Job Queue**: Asynq v0.24.1 (Redis-based) for async provisioning, backups, SSL renewal
+- **Template Engine**: Templ v0.2.543 (type-safe Go templates)
+- **Database**: PostgreSQL via lib/pq v1.10.9 and sqlx v1.3.5
+- **Cache**: Redis v8.11.5 with connection pooling
+- **Validation**: go-playground/validator v10.16.0
+- **Config**: Viper v1.18.2 for configuration management
+- **Logging**: Zerolog v1.31.0 for structured logging
+- **Metrics**: Prometheus client v1.18.0 for monitoring
+- **Crypto**: golang.org/x/crypto v0.18.0 for security operations
 
 ### Frontend (No React)
-- **HTMX**: Hypermedia-driven interactions, server-side rendering
-- **Alpine.js**: Minimal client-side reactivity for modals, dropdowns, forms
-- **CSS**: Tailwind CSS + DaisyUI components
+- **HTMX**: Hypermedia-driven interactions, server-side rendering (htmx.org v1.9.10)
+- **Alpine.js**: Minimal client-side reactivity for modals, dropdowns, forms (v3.13.3)  
+- **CSS**: Tailwind CSS v3.4.0 with @tailwindcss/forms and @tailwindcss/typography plugins
 - **Real-time**: Server-Sent Events (SSE) for live status updates
+- **Build**: PostCSS + Autoprefixer for CSS processing
 
 ### Data Layer
 - **PostgreSQL 15+**: Core relational data (users, servers, sites, domains, billing, audit logs)
@@ -48,6 +56,12 @@ VIP Hosting Panel is a modern, multi-tenant web hosting control panel that centr
 - **Never use mock/placeholder data** in production code
 - **Fallback pattern**: Display `N/A` or `--` when data is unavailable, with retry logic
 - **Error handling**: Log failures, show user-friendly messages, continue attempting to fetch in background
+
+### Multi-Version Support
+- **PHP**: Support versions  8.0-8.3 with isolated configurations
+- **Node.js**: Support versions 14.x, 16.x, 18.x, 20.x, 21.x with version switching
+- **Databases**: MySQL 5.7/8.0, PostgreSQL 12-16, MongoDB 4.4-7.0, Redis 6-7
+- **Web Servers**: Nginx, Apache2, LiteSpeed, Caddy with auto-switching capabilities
 
 ### Data Fetching Patterns
 ```go
@@ -111,26 +125,28 @@ func GetServerMetrics(serverID string) (*Metrics, error) {
 
 ### Local Development
 ```bash
-# Install Go dependencies
+# Install Go dependencies  
 go mod download
 
 # Install frontend dependencies
 npm install
 
-# Setup local PostgreSQL and Redis (must be installed on system)
-make setup-dev-db
+# Generate Templ templates (required before building)
+make build-templ
+
+# Build Tailwind CSS
+make build-css
 
 # Run database migrations
 make migrate
 
-# Start API server (development mode with hot reload)
-make dev-api
+# Start development server (runs API, Worker, CSS watch, Templ watch)
+make dev
 
-# Start worker (separate terminal)
-make dev-worker
-
-# Build Tailwind CSS
-npm run build:css
+# Alternative: Run components separately
+make dev-api    # API server only
+make dev-worker # Background worker only
+npm run watch:css # CSS hot reload
 ```
 
 ### Building for Production
@@ -166,10 +182,25 @@ ansible-playbook automation/playbooks/provision-server.yml \
 ansible-playbook automation/playbooks/deploy-site.yml \
   --extra-vars "site_id=site_abc456 domain=example.com"
 
-# Install PHP version
+# Install specific software versions
 ansible-playbook automation/playbooks/install-php.yml \
   --extra-vars "php_version=8.3"
+ansible-playbook automation/playbooks/install-nodejs.yml \
+  --extra-vars "node_version=20"
+ansible-playbook automation/playbooks/install-mysql.yml \
+  --extra-vars "mysql_version=8.0"
+
+# Security and email setup
+ansible-playbook automation/playbooks/setup-email.yml
+ansible-playbook automation/playbooks/install-waf.yml
+ansible-playbook automation/playbooks/security-hardening.yml
 ```
+
+### One-Click Application Deployment
+- **WordPress**: Automated installation with security hardening
+- **Laravel**: Composer setup, environment configuration, queue workers
+- **Node.js Apps**: PM2 process management, environment variables
+- **Static Sites**: Nginx configuration, build pipeline, CDN setup
 
 ## Key Architectural Patterns
 
@@ -251,9 +282,11 @@ ansible-playbook automation/playbooks/install-php.yml \
 - `automation/scripts/`: Python orchestration helpers
 
 ### Configuration Files
-- `configs/config.yaml`: Main app config (server, database, Redis, JWT, features)
-- `configs/providers.yaml`: API tokens for Hetzner, DigitalOcean, Cloudflare, Stripe
-- `configs/security.yaml`: Firewall rules, WAF settings, SSL policies
+- `configs/config.yaml.example`: Complete configuration template with all features, PHP/Node.js versions, security settings
+- `Makefile`: Comprehensive build automation with development, production, and maintenance targets
+- `go.mod`: Go dependencies including Fiber, Templ, Asynq, provider SDKs (Hetzner, DigitalOcean, Stripe)
+- `package.json`: Frontend dependencies (Tailwind CSS, Alpine.js, HTMX) with build scripts
+- `tailwind.config.js`: Custom design system with dark theme, orange primary color, Inter font
 - **Never commit**: Use `.example` files, load secrets from env vars or vault
 
 ## Data Fetching Best Practices
@@ -343,6 +376,12 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 - **Real-time updates**: SSE pushes status changes, HTMX swaps chip content
 - **Tooltips**: Show last updated timestamp on hover
 
+### Design System
+- **Color Palette**: Primary orange (#FF6B35), Dark theme (navy/slate), Status colors (green/yellow/red/blue)
+- **Typography**: Inter font family, consistent weight hierarchy (400/500/700)
+- **Components**: Pre-built cards, modals, forms, tables, badges, buttons with consistent styling
+- **Theme**: Dark theme primary with light mode toggle, responsive breakpoints
+
 ## Security Checklist for Every Feature
 
 - [ ] Input validation (whitelist, length limits, regex patterns)
@@ -418,48 +457,67 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 
 ### Development
 ```bash
-# Start dev environment
+# Start full dev environment (API + Worker + CSS watch + Templ watch)
 make dev
 
-# Run migrations
-make migrate
+# Build components individually
+make build-templ      # Generate Go code from Templ templates
+make build-css        # Build Tailwind CSS
+make build           # Build all binaries
 
-# Generate Templ templates
-templ generate
+# Database operations
+make migrate         # Run database migrations
+make rollback        # Rollback last migration
+make seed           # Seed database with test data
 
-# Build Tailwind CSS
-npm run build:css
-
-# Run tests
-make test
-
-# Format code
-gofmt -w .
+# Testing and quality
+make test           # Run all tests with coverage
+make test-unit      # Unit tests only
+make test-integration # Integration tests only
+make lint           # Run linters
+make format         # Format Go code
 ```
 
-### Deployment
+### Production Deployment
 ```bash
-# Build production binaries
-make build
+# Full installation (as sudo)
+make install                 # Complete setup (binaries, configs, directories)
+make install-services        # Install and start systemd services
+make setup-nginx            # Configure Nginx reverse proxy
 
-# Install on server (run on target server)
-sudo bash scripts/install.sh
+# Service management
+make status                 # Check all service status
+make health                 # Full system health check
+make start/stop/restart     # Control all services
+make restart-api/restart-worker # Control individual services
 
-# Manual service management
-sudo systemctl status vip-panel-api
-sudo systemctl restart vip-panel-worker
-sudo journalctl -u vip-panel-api -f
+# Monitoring and troubleshooting
+make logs                   # Tail all service logs
+make logs-api/logs-worker   # Tail specific service logs
+
+# Production updates
+make update                 # Update binaries and restart services
+make backup                 # Create configuration and data backup
 ```
 
-### Debugging
+### Debugging & Maintenance
 ```bash
-# View API logs
-sudo journalctl -u vip-panel-api -f --since "10 minutes ago"
+# System health check
+make health
 
-# Check Redis queue
+# View logs with context
+journalctl -u vip-panel-api -f --since "10 minutes ago"
+journalctl -u vip-panel-worker -f --since "1 hour ago"
+
+# Check job queue status
 redis-cli LLEN asynq:queues:default
+redis-cli LLEN asynq:queues:high
 
-# Test Ansible playbook
+# Test configurations
+nginx -t                    # Test Nginx config
+./build/vip-panel-cli version # Check CLI tool
+
+# Ansible testing
 ansible-playbook automation/playbooks/provision-server.yml --check --diff
 ```
 

@@ -1,102 +1,98 @@
-VIP Hosting Panel v2 - Enterprise Edition
+# VIP Hosting Panel v2 - Enterprise Edition
+
 Modern, secure, and high-performance hosting control panel built with Go, HTMX, and Python/Ansible.
-🚀 Features
-Infrastructure Management
 
-Multi-Database Support: MySQL 5.7/8.0, PostgreSQL 12-16, MongoDB 4.4-7.0, Redis 6-7
-Multi-PHP Support: PHP 5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2, 8.3
-Multi-Node.js Support: Node.js 14.x, 16.x, 18.x, 20.x, 21.x
-Multi-Webserver: Nginx, Apache2, LiteSpeed, Caddy (with auto-switching)
-Server Providers: Hetzner, DigitalOcean, Vultr, AWS, Custom SSH
+## 🚀 Features
 
-Security Features
+### Infrastructure Management
+- **Multi-Database Support**: MySQL 5.7/8.0, PostgreSQL 12-16, MongoDB 4.4-7.0, Redis 6-7
+- **Multi-PHP Support**: PHP 5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2, 8.3
+- **Multi-Node.js Support**: Node.js 14.x, 16.x, 18.x, 20.x, 21.x
+- **Multi-Webserver**: Nginx, Apache2, LiteSpeed, Caddy (with auto-switching)
+- **Server Providers**: Hetzner, DigitalOcean, Vultr, AWS, Custom SSH
 
-WAF Integration: ModSecurity with OWASP Core Rule Set
-Custom WAF Rules: Per-site and global rule management
-Anti Code Injection: Input validation and sanitization
-XSS Protection: Content Security Policy headers
-SQL Injection Prevention: Prepared statements enforcement
-ClamAV Antivirus: Real-time file scanning
-Fail2ban: Brute force protection for SSH, FTP, Email, Panel
-Firewall Manager: UFW/iptables with preset rules
-SSL/TLS Management: Let's Encrypt auto-renewal + custom certs
-2FA Authentication: TOTP support for all user roles
-Audit Logging: Comprehensive action tracking
+### Security Features
+- **WAF Integration**: ModSecurity with OWASP Core Rule Set
+- **Custom WAF Rules**: Per-site and global rule management
+- **Anti Code Injection**: Input validation and sanitization
+- **XSS Protection**: Content Security Policy headers
+- **SQL Injection Prevention**: Prepared statements enforcement
+- **ClamAV Antivirus**: Real-time file scanning
+- **Fail2ban**: Brute force protection for SSH, FTP, Email, Panel
+- **Firewall Manager**: UFW/iptables with preset rules
+- **SSL/TLS Management**: Let's Encrypt auto-renewal + custom certs
+- **2FA Authentication**: TOTP support for all user roles
+- **Audit Logging**: Comprehensive action tracking
 
-Email Services
+### Email Services
+- **Mail Server**: Postfix (SMTP) + Dovecot (IMAP/POP3)
+- **Webmail**: Roundcube and SnappyMail integrated
+- **Email Accounts**: Create/delete/manage mailboxes
+- **Email Aliases**: Unlimited aliases per domain
+- **Email Forwarding**: Local and external forwarding
+- **Spam Protection**: SpamAssassin integration
+- **DKIM/SPF/DMARC**: Auto-configuration
+- **Mail Quotas**: Per-account storage limits
+- **Email Filters**: Sieve-based filtering
 
-Mail Server: Postfix (SMTP) + Dovecot (IMAP/POP3)
-Webmail: Roundcube and SnappyMail integrated
-Email Accounts: Create/delete/manage mailboxes
-Email Aliases: Unlimited aliases per domain
-Email Forwarding: Local and external forwarding
-Spam Protection: SpamAssassin integration
-DKIM/SPF/DMARC: Auto-configuration
-Mail Quotas: Per-account storage limits
-Email Filters: Sieve-based filtering
+### DNS Management
+- **DNS Servers**: Bind9 (primary) or PowerDNS
+- **DNS Providers**: Cloudflare, Route53, Custom
+- **Zone Management**: A, AAAA, CNAME, MX, TXT, SRV, CAA records
+- **DNSSEC Support**: Automated key management
+- **DNS Templates**: Quick setup for common configurations
+- **Geo DNS**: Location-based routing
+- **Health Checks**: Automatic failover
 
-DNS Management
+### Website Management
+- **One-Click Apps**: WordPress, Laravel, Node.js, Static sites
+- **Git Deployment**: GitHub/GitLab webhooks
+- **Zero-Downtime Deploy**: Blue-green deployments
+- **Staging Environments**: Isolated testing environments
+- **File Manager**: Web-based with upload/download
+- **FTP/SFTP**: Per-user account management
+- **Cron Jobs**: Visual cron editor
+- **Environment Variables**: Secure secret management
+- **Custom nginx/Apache configs**: Per-site overrides
 
-DNS Servers: Bind9 (primary) or PowerDNS
-DNS Providers: Cloudflare, Route53, Custom
-Zone Management: A, AAAA, CNAME, MX, TXT, SRV, CAA records
-DNSSEC Support: Automated key management
-DNS Templates: Quick setup for common configurations
-Geo DNS: Location-based routing
-Health Checks: Automatic failover
+### Database Management
+- **phpMyAdmin**: MySQL/MariaDB management
+- **pgAdmin**: PostgreSQL management
+- **Adminer**: Universal database tool
+- **MongoDB Compass**: MongoDB GUI
+- **Redis Commander**: Redis management
+- **Database Backups**: Automated dumps
+- **Query Monitor**: Slow query detection
 
-Website Management
+### Monitoring & Analytics
+- **Real-time Metrics**: CPU, RAM, Disk, Network
+- **Application Performance**: Response times, error rates
+- **Uptime Monitoring**: HTTP/HTTPS checks
+- **SSL Certificate Expiry**: Alerts before expiration
+- **Resource Alerts**: Customizable thresholds
+- **Log Aggregation**: Centralized log viewer
+- **Traffic Analytics**: Bandwidth usage per site
 
-One-Click Apps: WordPress, Laravel, Node.js, Static sites
-Git Deployment: GitHub/GitLab webhooks
-Zero-Downtime Deploy: Blue-green deployments
-Staging Environments: Isolated testing environments
-File Manager: Web-based with upload/download
-FTP/SFTP: Per-user account management
-Cron Jobs: Visual cron editor
-Environment Variables: Secure secret management
-Custom nginx/Apache configs: Per-site overrides
+### Backup & Recovery
+- **Automated Backups**: Scheduled full/incremental
+- **Backup Storage**: Local, S3, FTP, SFTP
+- **One-Click Restore**: Point-in-time recovery
+- **Backup Encryption**: AES-256 encryption
+- **Retention Policies**: Configurable cleanup
+- **Backup Verification**: Automated integrity checks
 
-Database Management
+### Billing & Reseller
+- **Multi-tenant**: Unlimited reseller levels
+- **Stripe Integration**: Subscriptions and one-time payments
+- **Invoice Generation**: Automated PDF invoices
+- **Usage-Based Billing**: Metered resources
+- **Reseller Margins**: Configurable markup
+- **Client Portal**: Self-service management
+- **Payment Methods**: Card, PayPal, Bank transfer
 
-phpMyAdmin: MySQL/MariaDB management
-pgAdmin: PostgreSQL management
-Adminer: Universal database tool
-MongoDB Compass: MongoDB GUI
-Redis Commander: Redis management
-Database Backups: Automated dumps
-Query Monitor: Slow query detection
+## 🏗️ Architecture
 
-Monitoring & Analytics
-
-Real-time Metrics: CPU, RAM, Disk, Network
-Application Performance: Response times, error rates
-Uptime Monitoring: HTTP/HTTPS checks
-SSL Certificate Expiry: Alerts before expiration
-Resource Alerts: Customizable thresholds
-Log Aggregation: Centralized log viewer
-Traffic Analytics: Bandwidth usage per site
-
-Backup & Recovery
-
-Automated Backups: Scheduled full/incremental
-Backup Storage: Local, S3, FTP, SFTP
-One-Click Restore: Point-in-time recovery
-Backup Encryption: AES-256 encryption
-Retention Policies: Configurable cleanup
-Backup Verification: Automated integrity checks
-
-Billing & Reseller
-
-Multi-tenant: Unlimited reseller levels
-Stripe Integration: Subscriptions and one-time payments
-Invoice Generation: Automated PDF invoices
-Usage-Based Billing: Metered resources
-Reseller Margins: Configurable markup
-Client Portal: Self-service management
-Payment Methods: Card, PayPal, Bank transfer
-
-🏗️ Architecture
+```
 ┌─────────────────────────────────────────────┐
 │     FRONTEND: HTMX + Alpine.js              │
 │     • Server-Side Rendering (Templ)         │
@@ -158,7 +154,11 @@ Payment Methods: Card, PayPal, Bank transfer
 │     • SSH Access: Ansible-based management  │
 │     • Services: Nginx, PHP-FPM, MySQL, etc. │
 └─────────────────────────────────────────────┘
-📁 Project Structure
+```
+
+## 📁 Project Structure
+
+```
 vip-hosting-panel-v2/
 ├── cmd/
 │   ├── api/                    # Main web server
@@ -423,42 +423,47 @@ vip-hosting-panel-v2/
 ├── package.json                # Frontend dependencies
 ├── tailwind.config.js          # Tailwind configuration
 └── README.md                   # This file
-🚦 Quick Start
-Prerequisites
+```
 
-Ubuntu 22.04/24.04 or Debian 11/12
-Go 1.21+
-Node.js 18+
-PostgreSQL 15+
-Redis 7+
-systemd (included in Ubuntu/Debian)
-Nginx (as reverse proxy)
+## 🚦 Quick Start
 
-Production Installation
+### Prerequisites
 
-Clone the repository
+- Ubuntu 22.04/24.04 or Debian 11/12
+- Go 1.21+
+- Node.js 18+
+- PostgreSQL 15+
+- Redis 7+
+- systemd (included in Ubuntu/Debian)
+- Nginx (as reverse proxy)
 
-bashgit clone https://github.com/yourusername/vip-hosting-panel-v2.git
+### Production Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/vip-hosting-panel-v2.git
 cd vip-hosting-panel-v2
+```
 
-Run the automated installer
+2. **Run the automated installer**
+```bash
+sudo bash scripts/install.sh
+```
 
-bashsudo bash scripts/install.sh
 This will:
+- Install all system dependencies (PostgreSQL, Redis, Nginx)
+- Build the Go binaries
+- Setup systemd services
+- Configure firewall
+- Create database and run migrations
+- Generate SSL certificates
+- Start all services
 
-Install all system dependencies (PostgreSQL, Redis, Nginx)
-Build the Go binaries
-Setup systemd services
-Configure firewall
-Create database and run migrations
-Generate SSL certificates
-Start all services
+### Manual Installation
 
-Manual Installation
-
-Install system dependencies
-
-bash# Update system
+1. **Install system dependencies**
+```bash
+# Update system
 sudo apt update && sudo apt upgrade -y
 
 # Install PostgreSQL
@@ -482,54 +487,65 @@ sudo apt install nodejs -y
 # Install Python dependencies
 sudo apt install python3 python3-pip ansible -y
 pip3 install -r automation/requirements.txt
+```
 
-Setup database
-
-bashsudo -u postgres psql << EOF
+2. **Setup database**
+```bash
+sudo -u postgres psql << EOF
 CREATE DATABASE vip_hosting;
 CREATE USER vip_panel WITH PASSWORD 'change_this_password';
 GRANT ALL PRIVILEGES ON DATABASE vip_hosting TO vip_panel;
 \c vip_hosting
 GRANT ALL ON SCHEMA public TO vip_panel;
 EOF
+```
 
-Copy and configure
-
-bash# Copy config files
+3. **Copy and configure**
+```bash
+# Copy config files
 cp configs/config.yaml.example configs/config.yaml
 cp configs/providers.yaml.example configs/providers.yaml
 
 # Edit configurations
 nano configs/config.yaml
+```
 
-Build the application
+4. **Build the application**
+```bash
+make build
+```
 
-bashmake build
+5. **Install systemd services**
+```bash
+sudo make install-services
+```
 
-Install systemd services
-
-bashsudo make install-services
-
-Start services
-
-bashsudo systemctl enable vip-panel-api
+6. **Start services**
+```bash
+sudo systemctl enable vip-panel-api
 sudo systemctl enable vip-panel-worker
 sudo systemctl start vip-panel-api
 sudo systemctl start vip-panel-worker
+```
 
-Setup Nginx reverse proxy
-
-bashsudo make setup-nginx
+7. **Setup Nginx reverse proxy**
+```bash
+sudo make setup-nginx
 sudo systemctl reload nginx
+```
 
-Access the panel
-
+8. **Access the panel**
+```
 https://your-domain.com or https://your-server-ip
 Default credentials:
 Email: admin@example.com
 Password: admin123
-Development Setup
-bash# Install dependencies
+```
+
+### Development Setup
+
+```bash
+# Install dependencies
 go mod download
 npm install
 
@@ -538,9 +554,14 @@ make migrate
 
 # Start in development mode
 make dev
-🔧 Configuration
-Main Configuration (configs/config.yaml)
-yamlserver:
+```
+
+## 🔧 Configuration
+
+### Main Configuration (configs/config.yaml)
+
+```yaml
+server:
   host: 0.0.0.0
   port: 3000
   read_timeout: 30s
@@ -572,8 +593,12 @@ features:
   dns_management: true
   waf: true
   antivirus: true
-Provider Configuration (configs/providers.yaml)
-yamlproviders:
+```
+
+### Provider Configuration (configs/providers.yaml)
+
+```yaml
+providers:
   hetzner:
     enabled: true
     api_token: "your-hetzner-api-token"
@@ -593,191 +618,224 @@ stripe:
   secret_key: "sk_test_..."
   public_key: "pk_test_..."
   webhook_secret: "whsec_..."
-📚 API Documentation
-Authentication
-POST /api/auth/login
-json{
+```
+
+## 📚 API Documentation
+
+### Authentication
+
+**POST /api/auth/login**
+```json
+{
   "email": "user@example.com",
   "password": "password123"
 }
-POST /api/auth/register
-json{
+```
+
+**POST /api/auth/register**
+```json
+{
   "email": "user@example.com",
   "password": "password123",
   "name": "John Doe"
 }
-Server Management
-GET /api/servers - List all servers
-POST /api/servers - Create new server
-GET /api/servers/:id - Get server details
-PUT /api/servers/:id - Update server
-DELETE /api/servers/:id - Delete server
-POST /api/servers/:id/reboot - Reboot server
-POST /api/servers/:id/resize - Resize server
-Site Management
-GET /api/sites - List all sites
-POST /api/sites - Create new site
-GET /api/sites/:id - Get site details
-PUT /api/sites/:id - Update site
-DELETE /api/sites/:id - Delete site
-POST /api/sites/:id/deploy - Deploy site
-Database Management
-GET /api/databases - List all databases
-POST /api/databases - Create database
-DELETE /api/databases/:id - Delete database
-Email Management
-GET /api/email/accounts - List email accounts
-POST /api/email/accounts - Create email account
-GET /api/email/aliases - List aliases
-POST /api/email/aliases - Create alias
-DNS Management
-GET /api/dns/zones - List DNS zones
-POST /api/dns/zones - Create DNS zone
-GET /api/dns/records - List DNS records
-POST /api/dns/records - Create DNS record
-🔐 Security Features
-WAF Rules
+```
+
+### Server Management
+
+**GET /api/servers** - List all servers
+**POST /api/servers** - Create new server
+**GET /api/servers/:id** - Get server details
+**PUT /api/servers/:id** - Update server
+**DELETE /api/servers/:id** - Delete server
+**POST /api/servers/:id/reboot** - Reboot server
+**POST /api/servers/:id/resize** - Resize server
+
+### Site Management
+
+**GET /api/sites** - List all sites
+**POST /api/sites** - Create new site
+**GET /api/sites/:id** - Get site details
+**PUT /api/sites/:id** - Update site
+**DELETE /api/sites/:id** - Delete site
+**POST /api/sites/:id/deploy** - Deploy site
+
+### Database Management
+
+**GET /api/databases** - List all databases
+**POST /api/databases** - Create database
+**DELETE /api/databases/:id** - Delete database
+
+### Email Management
+
+**GET /api/email/accounts** - List email accounts
+**POST /api/email/accounts** - Create email account
+**GET /api/email/aliases** - List aliases
+**POST /api/email/aliases** - Create alias
+
+### DNS Management
+
+**GET /api/dns/zones** - List DNS zones
+**POST /api/dns/zones** - Create DNS zone
+**GET /api/dns/records** - List DNS records
+**POST /api/dns/records** - Create DNS record
+
+## 🔐 Security Features
+
+### WAF Rules
+
 The panel includes ModSecurity with OWASP Core Rule Set. Custom rules can be added per-site:
-nginx# Custom WAF rule example
+
+```nginx
+# Custom WAF rule example
 SecRule REQUEST_URI "@contains /admin" \
     "id:1000,phase:1,deny,status:403,msg:'Admin access blocked'"
-Firewall Rules
+```
+
+### Firewall Rules
+
 Default firewall rules are automatically configured:
 
-SSH (22) - Restricted to management IPs
-HTTP (80) - Open
-HTTPS (443) - Open
-MySQL (3306) - Localhost only
-PostgreSQL (5432) - Localhost only
-SMTP (25, 587) - Open
-IMAP (143, 993) - Open
-POP3 (110, 995) - Open
+- SSH (22) - Restricted to management IPs
+- HTTP (80) - Open
+- HTTPS (443) - Open
+- MySQL (3306) - Localhost only
+- PostgreSQL (5432) - Localhost only
+- SMTP (25, 587) - Open
+- IMAP (143, 993) - Open
+- POP3 (110, 995) - Open
 
-Fail2ban Configuration
+### Fail2ban Configuration
+
 Automatic brute-force protection for:
+- SSH
+- FTP
+- Email (SMTP, IMAP, POP3)
+- Panel login
+- WordPress
+- Custom rules per application
 
-SSH
-FTP
-Email (SMTP, IMAP, POP3)
-Panel login
-WordPress
-Custom rules per application
+## 📊 Monitoring
 
-📊 Monitoring
-Metrics Collected
+### Metrics Collected
 
-CPU usage (per core and total)
-Memory usage (used, free, cached)
-Disk usage (per partition)
-Network traffic (in/out)
-Process count
-Load average
-Database connections
-Web server requests
-Email queue size
+- CPU usage (per core and total)
+- Memory usage (used, free, cached)
+- Disk usage (per partition)
+- Network traffic (in/out)
+- Process count
+- Load average
+- Database connections
+- Web server requests
+- Email queue size
 
-Alert Conditions
+### Alert Conditions
 
-CPU > 80% for 5 minutes
-Memory > 90%
-Disk > 85%
-Service down
-SSL certificate expiring in < 7 days
-Backup failed
-Security scan detected malware
+- CPU > 80% for 5 minutes
+- Memory > 90%
+- Disk > 85%
+- Service down
+- SSL certificate expiring in < 7 days
+- Backup failed
+- Security scan detected malware
 
-🔄 Backup System
-Backup Types
+## 🔄 Backup System
 
-Full Backup: Complete server snapshot
-Incremental Backup: Changes since last backup
-Database Backup: SQL dumps
-File Backup: Website files only
+### Backup Types
 
-Backup Storage
+1. **Full Backup**: Complete server snapshot
+2. **Incremental Backup**: Changes since last backup
+3. **Database Backup**: SQL dumps
+4. **File Backup**: Website files only
 
-Local storage (on-server)
-S3-compatible (AWS, DigitalOcean Spaces, MinIO)
-FTP/SFTP remote servers
-Multiple destinations per backup
+### Backup Storage
 
-Restore Process
+- Local storage (on-server)
+- S3-compatible (AWS, DigitalOcean Spaces, MinIO)
+- FTP/SFTP remote servers
+- Multiple destinations per backup
 
-Select backup point
-Choose restore type (full, files only, database only)
-Select destination (original location or new location)
-Verify and confirm
-Automated rollback if restore fails
+### Restore Process
 
-💳 Billing System
-Subscription Plans
+1. Select backup point
+2. Choose restore type (full, files only, database only)
+3. Select destination (original location or new location)
+4. Verify and confirm
+5. Automated rollback if restore fails
 
-Tiered pricing based on resources
-Custom pricing per reseller
-Usage-based add-ons
-One-time charges support
+## 💳 Billing System
 
-Invoice Generation
+### Subscription Plans
 
-Automated monthly invoicing
-Prorated charges for upgrades/downgrades
-VAT/tax calculation
-Multi-currency support
-PDF generation with custom branding
+- Tiered pricing based on resources
+- Custom pricing per reseller
+- Usage-based add-ons
+- One-time charges support
 
-🎯 Roadmap
-v1.0 (Current - Months 1-2)
+### Invoice Generation
 
-✅ Core infrastructure
-✅ Multi-PHP/Node.js support
-✅ Basic security features
-✅ Email server
-✅ DNS management
-✅ Billing integration
+- Automated monthly invoicing
+- Prorated charges for upgrades/downgrades
+- VAT/tax calculation
+- Multi-currency support
+- PDF generation with custom branding
 
-v1.1 (Month 3)
+## 🎯 Roadmap
 
- Advanced WAF rules
- Container support (Docker)
- Kubernetes integration
- Advanced analytics
- Mobile app
+### v1.0 (Current - Months 1-2)
+- ✅ Core infrastructure
+- ✅ Multi-PHP/Node.js support
+- ✅ Basic security features
+- ✅ Email server
+- ✅ DNS management
+- ✅ Billing integration
 
-v1.2 (Month 4)
+### v1.1 (Month 3)
+- [ ] Advanced WAF rules
+- [ ] Container support (Docker)
+- [ ] Kubernetes integration
+- [ ] Advanced analytics
+- [ ] Mobile app
 
- White-labeling
- Plugin system
- Marketplace
- Advanced automation
- AI-powered optimization
+### v1.2 (Month 4)
+- [ ] White-labeling
+- [ ] Plugin system
+- [ ] Marketplace
+- [ ] Advanced automation
+- [ ] AI-powered optimization
 
-📖 Documentation
+## 📖 Documentation
 
-Getting Started Guide
-Architecture Overview
-API Reference
-Ansible Playbooks
-Security Best Practices
-Troubleshooting
+- [Getting Started Guide](docs/getting-started.md)
+- [Architecture Overview](docs/architecture.md)
+- [API Reference](docs/api-reference.md)
+- [Ansible Playbooks](docs/ansible-playbooks.md)
+- [Security Best Practices](docs/security.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
-🤝 Contributing
-Contributions are welcome! Please read CONTRIBUTING.md for details.
-📄 License
-This project is licensed under the MIT License - see LICENSE file for details.
-🙏 Acknowledgments
+## 🤝 Contributing
 
-HTMX for the hypermedia approach
-Templ for type-safe Go templates
-Fiber for the blazing-fast web framework
-Ansible for infrastructure automation
-The open-source community
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-📞 Support
+## 📄 License
 
-Documentation: https://docs.superhosting.vip
-Community Forum: https://community.superhosting.vip
-Discord: https://discord.gg/viphostingpanel
-Email: support@vsuperhosting.vip
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
 
+## 🙏 Acknowledgments
+
+- HTMX for the hypermedia approach
+- Templ for type-safe Go templates
+- Fiber for the blazing-fast web framework
+- Ansible for infrastructure automation
+- The open-source community
+
+## 📞 Support
+
+- Documentation: https://docs.viphostingpanel.com
+- Community Forum: https://community.viphostingpanel.com
+- Discord: https://discord.gg/viphostingpanel
+- Email: support@viphostingpanel.com
+
+---
 
 Made with ❤️ by the VIP Hosting Panel Team
