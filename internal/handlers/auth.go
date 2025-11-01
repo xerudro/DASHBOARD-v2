@@ -93,16 +93,6 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Hash password to compare
-	passwordHash, err := auth.HashPassword(req.Password)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to hash provided credentials for comparison")
-		return c.Status(fiber.StatusInternalServerError).JSON(LoginResponse{
-			Success: false,
-			Message: "Authentication failed",
-		})
-	}
-
 	// Find user
 	user, err := h.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
@@ -117,7 +107,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	}
 
 	// Verify password
-	if !auth.CheckPassword(req.Password, user.PasswordHash) {
+	if !auth.CheckPasswordHash(req.Password, user.PasswordHash) {
 		log.Warn().
 			Str("email", req.Email).
 			Str("user_id", user.ID.String()).
@@ -180,8 +170,8 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		User: &UserResponse{
 			ID:        user.ID,
 			Email:     user.Email,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
+			FirstName: user.Name, // User model has Name field, not FirstName/LastName
+			LastName:  "",        // User model has Name field, not FirstName/LastName
 			Role:      user.Role,
 			Status:    user.Status,
 		},
@@ -237,8 +227,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		TenantID:     defaultTenantID,
 		Email:        req.Email,
 		PasswordHash: passwordHash,
-		FirstName:    req.FirstName,
-		LastName:     req.LastName,
+		Name:         req.FirstName + " " + req.LastName, // User model has Name field
 		Role:         models.RoleClient,
 		Status:       models.UserStatusActive,
 	}
@@ -445,7 +434,7 @@ func (h *AuthHandler) LoginForm(c *fiber.Ctx) error {
 	}
 
 	// Verify password
-	if !auth.CheckPassword(password, user.PasswordHash) {
+	if !auth.CheckPasswordHash(password, user.PasswordHash) {
 		return c.Redirect("/login?error=invalid_credentials")
 	}
 
@@ -510,8 +499,7 @@ func (h *AuthHandler) RegisterForm(c *fiber.Ctx) error {
 		TenantID:     defaultTenantID,
 		Email:        email,
 		PasswordHash: passwordHash,
-		FirstName:    firstName,
-		LastName:     lastName,
+		Name:         firstName + " " + lastName, // User model has Name field
 		Role:         models.RoleClient,
 		Status:       models.UserStatusActive,
 	}
