@@ -13,17 +13,17 @@ import (
 
 // PoolOptimizer provides advanced connection pool management
 type PoolOptimizer struct {
-	db                    *sqlx.DB
-	preparedStmtCache     map[string]*sqlx.Stmt
-	preparedStmtMutex     sync.RWMutex
-	healthCheckInterval   time.Duration
-	connectionTimeout     time.Duration
-	queryTimeout          time.Duration
-	slowQueryThreshold    time.Duration
-	maxRetries            int
-	retryDelay            time.Duration
-	metrics               *PoolMetrics
-	stopHealthCheck       chan struct{}
+	db                  *sqlx.DB
+	preparedStmtCache   map[string]*sqlx.Stmt
+	preparedStmtMutex   sync.RWMutex
+	healthCheckInterval time.Duration
+	connectionTimeout   time.Duration
+	queryTimeout        time.Duration
+	slowQueryThreshold  time.Duration
+	maxRetries          int
+	retryDelay          time.Duration
+	metrics             *PoolMetrics
+	stopHealthCheck     chan struct{}
 }
 
 // PoolMetrics tracks connection pool metrics
@@ -354,7 +354,18 @@ func (po *PoolOptimizer) GetMetrics() PoolMetrics {
 	po.metrics.mu.RLock()
 	defer po.metrics.mu.RUnlock()
 
-	return *po.metrics
+	// Return a copy to avoid returning locked value
+	return PoolMetrics{
+		TotalQueries:          po.metrics.TotalQueries,
+		SlowQueries:           po.metrics.SlowQueries,
+		FailedQueries:         po.metrics.FailedQueries,
+		AvgQueryDuration:      po.metrics.AvgQueryDuration,
+		totalQueryDuration:    po.metrics.totalQueryDuration,
+		PreparedStmtCacheHits: po.metrics.PreparedStmtCacheHits,
+		PreparedStmtCacheMiss: po.metrics.PreparedStmtCacheMiss,
+		ConnectionErrors:      po.metrics.ConnectionErrors,
+		Retries:               po.metrics.Retries,
+	}
 }
 
 // ClearPreparedStatements clears the prepared statement cache

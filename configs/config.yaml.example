@@ -32,10 +32,11 @@ database:
   user: "vip_panel"
   password: "postgres"
   
-  # Connection pool
-  max_connections: 100
-  max_idle_connections: 10
-  max_lifetime: "1h"
+  # Connection pool - Optimized for performance (Task 2)
+  max_connections: 100       # Support 100-200 concurrent users (increased from 25)
+  max_idle_connections: 30   # Keep more idle connections ready (increased from 10)
+  max_lifetime: "30m"        # Recycle connections more frequently (reduced from 1h)
+  idle_timeout: "5m"         # Close idle connections after 5 minutes (new setting)
   
   # SSL mode: disable, require, verify-ca, verify-full
   ssl_mode: "disable"

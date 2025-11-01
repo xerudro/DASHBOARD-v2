@@ -124,9 +124,10 @@ func loadConfig() (*Config, error) {
 	viper.SetDefault("database.host", "localhost")
 	viper.SetDefault("database.port", 5432)
 	viper.SetDefault("database.ssl_mode", "disable")
-	viper.SetDefault("database.max_connections", 25)
-	viper.SetDefault("database.max_idle_connections", 10)
-	viper.SetDefault("database.max_lifetime", "1h")
+	viper.SetDefault("database.max_connections", 100)     // Increased from 25 to support 100-200 concurrent users
+	viper.SetDefault("database.max_idle_connections", 30) // Increased from 10 to maintain pool efficiency
+	viper.SetDefault("database.max_lifetime", "30m")      // Reduced from 1h for better connection recycling
+	viper.SetDefault("database.idle_timeout", "5m")       // Added: Close idle connections after 5 minutes
 	viper.SetDefault("redis.host", "localhost")
 	viper.SetDefault("redis.port", 6379)
 	viper.SetDefault("redis.db", 0)

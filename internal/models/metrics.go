@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -8,17 +9,17 @@ import (
 
 // ServerMetrics represents time-series server metrics
 type ServerMetrics struct {
-	Time            time.Time  `json:"time" db:"time"`
-	ServerID        uuid.UUID  `json:"server_id" db:"server_id"`
-	CPUPercent      *float64   `json:"cpu_percent,omitempty" db:"cpu_percent"`
-	MemoryUsedMB    *int64     `json:"memory_used_mb,omitempty" db:"memory_used_mb"`
-	MemoryTotalMB   *int64     `json:"memory_total_mb,omitempty" db:"memory_total_mb"`
-	DiskUsedGB      *int64     `json:"disk_used_gb,omitempty" db:"disk_used_gb"`
-	DiskTotalGB     *int64     `json:"disk_total_gb,omitempty" db:"disk_total_gb"`
-	NetworkInMB     *int64     `json:"network_in_mb,omitempty" db:"network_in_mb"`
-	NetworkOutMB    *int64     `json:"network_out_mb,omitempty" db:"network_out_mb"`
-	LoadAverage     *float64   `json:"load_average,omitempty" db:"load_average"`
-	Connections     *int       `json:"connections,omitempty" db:"connections"`
+	Time          time.Time `json:"time" db:"time"`
+	ServerID      uuid.UUID `json:"server_id" db:"server_id"`
+	CPUPercent    *float64  `json:"cpu_percent,omitempty" db:"cpu_percent"`
+	MemoryUsedMB  *int64    `json:"memory_used_mb,omitempty" db:"memory_used_mb"`
+	MemoryTotalMB *int64    `json:"memory_total_mb,omitempty" db:"memory_total_mb"`
+	DiskUsedGB    *int64    `json:"disk_used_gb,omitempty" db:"disk_used_gb"`
+	DiskTotalGB   *int64    `json:"disk_total_gb,omitempty" db:"disk_total_gb"`
+	NetworkInMB   *int64    `json:"network_in_mb,omitempty" db:"network_in_mb"`
+	NetworkOutMB  *int64    `json:"network_out_mb,omitempty" db:"network_out_mb"`
+	LoadAverage   *float64  `json:"load_average,omitempty" db:"load_average"`
+	Connections   *int      `json:"connections,omitempty" db:"connections"`
 }
 
 // GetCPUDisplay returns formatted CPU usage or N/A
@@ -102,12 +103,12 @@ func formatDisk(used, total int64) string {
 }
 
 func formatFloat(value float64, precision int) string {
-	format := "%." + string(rune(precision+'0')) + "f"
-	return string([]byte(format))
+	format := "%." + fmt.Sprintf("%d", precision) + "f"
+	return fmt.Sprintf(format, value)
 }
 
 func formatInt64(value int64) string {
-	return string([]byte("%d"))
+	return fmt.Sprintf("%d", value)
 }
 
 // UptimeCheck represents a site uptime monitoring check

@@ -425,16 +425,3 @@ func getStatusColor(status string) string {
 func intToString(i int) string {
 	return fmt.Sprintf("%d", i)
 }
-
-func formatUptime(d time.Duration) string {
-	if d < time.Minute {
-		return "< 1m"
-	} else if d < time.Hour {
-		return fmt.Sprintf("%.0fm", d.Minutes())
-	} else if d < 24*time.Hour {
-		return fmt.Sprintf("%.0fh", d.Hours())
-	} else {
-		days := int(d.Hours() / 24)
-		return fmt.Sprintf("%dd", days)
-	}
-}

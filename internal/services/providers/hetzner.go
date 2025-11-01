@@ -3,7 +3,6 @@ package providers
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -640,25 +639,3 @@ func (h *HetznerProvider) convertServerInfo(server *hcloud.Server) *ServerInfo {
 // The current Server model uses UUIDs and different field types
 // Commenting out to prevent compilation errors - needs implementation
 // func (h *HetznerProvider) ConvertToModel(info *ServerInfo, tenantID string, userID int64) *models.Server {}
-
-// mapStatus maps Hetzner status to internal status
-func (h *HetznerProvider) mapStatus(hetznerStatus string) string {
-	switch hetznerStatus {
-	case "running":
-		return "ready"
-	case "initializing", "starting":
-		return "provisioning"
-	case "stopping", "off":
-		return "stopped"
-	case "deleting":
-		return "deleting"
-	default:
-		return "unknown"
-	}
-}
-
-// parseFloat converts a string to float64, returning 0 on error
-func parseFloat(s string) float64 {
-	f, _ := strconv.ParseFloat(s, 64)
-	return f
-}

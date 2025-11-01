@@ -22,6 +22,7 @@ type Config struct {
 	MaxConnections     int           `mapstructure:"max_connections"`
 	MaxIdleConnections int           `mapstructure:"max_idle_connections"`
 	MaxLifetime        time.Duration `mapstructure:"max_lifetime"`
+	IdleTimeout        time.Duration `mapstructure:"idle_timeout"` // Added: Close idle connections timeout
 }
 
 // RedisConfig represents Redis configuration
@@ -58,16 +59,21 @@ func NewDB(pgConfig Config, redisConfig RedisConfig) (*DB, error) {
 		return nil, fmt.Errorf("failed to connect to PostgreSQL: %w", err)
 	}
 
-	// Configure connection pool
-	postgres.SetMaxOpenConns(pgConfig.MaxConnections)
-	postgres.SetMaxIdleConns(pgConfig.MaxIdleConnections)
-	postgres.SetConnMaxLifetime(pgConfig.MaxLifetime)
+	// Configure connection pool for optimal performance
+	postgres.SetMaxOpenConns(pgConfig.MaxConnections)     // Max concurrent connections (now 100)
+	postgres.SetMaxIdleConns(pgConfig.MaxIdleConnections) // Keep idle connections ready (now 30)
+	postgres.SetConnMaxLifetime(pgConfig.MaxLifetime)     // Recycle connections (now 30m)
+	postgres.SetConnMaxIdleTime(pgConfig.IdleTimeout)     // Close idle connections (now 5m)
 
 	log.Info().
 		Str("host", pgConfig.Host).
 		Int("port", pgConfig.Port).
 		Str("database", pgConfig.Name).
-		Msg("Connected to PostgreSQL")
+		Int("max_connections", pgConfig.MaxConnections).
+		Int("max_idle_connections", pgConfig.MaxIdleConnections).
+		Dur("max_lifetime", pgConfig.MaxLifetime).
+		Dur("idle_timeout", pgConfig.IdleTimeout).
+		Msg("Connected to PostgreSQL with optimized connection pool")
 
 	// Connect to Redis
 	redisClient := redis.NewClient(&redis.Options{
