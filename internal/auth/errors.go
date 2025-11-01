@@ -15,6 +15,7 @@ var (
 	ErrTokenExpired       = errors.New("token has expired")
 	ErrInvalidSignature   = errors.New("invalid token signature")
 	ErrMissingToken       = errors.New("authorization token required")
+	ErrTokenRevoked       = errors.New("token has been revoked")
 
 	// Password errors
 	ErrPasswordTooShort   = errors.New("password must be at least 8 characters")
