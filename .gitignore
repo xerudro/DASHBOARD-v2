@@ -19,7 +19,7 @@ config.local.json
 *.p12
 *.pfx
 *.pub
-
+.exe
 # Operating System files
 # Windows
 Thumbs.db

@@ -38,10 +38,10 @@ type App struct {
 
 // Config holds application configuration
 type Config struct {
-	Server   ServerConfig          `mapstructure:"server"`
-	Database database.Config       `mapstructure:"database"`
-	Redis    database.RedisConfig  `mapstructure:"redis"`
-	JWT      middleware.JWTConfig  `mapstructure:"jwt"`
+	Server   ServerConfig         `mapstructure:"server"`
+	Database database.Config      `mapstructure:"database"`
+	Redis    database.RedisConfig `mapstructure:"redis"`
+	JWT      middleware.JWTConfig `mapstructure:"jwt"`
 	Log      LogConfig            `mapstructure:"log"`
 }
 
@@ -55,7 +55,7 @@ type ServerConfig struct {
 
 // LogConfig holds logging configuration
 type LogConfig struct {
-	Level string `mapstructure:"level"`
+	Level  string `mapstructure:"level"`
 	Format string `mapstructure:"format"` // json, console
 }
 
@@ -218,7 +218,7 @@ func (app *App) initServices() {
 func (app *App) initMonitoring() {
 	app.monitoring = monitoring.NewMonitoringService("v2.0.0", app.config.Server.Mode)
 	app.monitoring.Start()
-	
+
 	zlog.Info().Msg("Monitoring service initialized")
 }
 
@@ -227,7 +227,7 @@ func (app *App) initFiber() {
 	// Use optimized network configuration
 	networkOptimizer := middleware.NewNetworkOptimizer()
 	config := networkOptimizer.OptimizedFiberConfig()
-	
+
 	// Override with app-specific settings
 	config.ServerHeader = "VIP-Hosting-Panel"
 	config.AppName = "VIP Hosting Panel v2"
@@ -247,27 +247,25 @@ func (app *App) initFiber() {
 	// 2. Rate limiting (early to protect against abuse)
 	rateLimiter := middleware.NewRateLimiter(100, time.Minute) // 100 requests per minute
 	app.fiber.Use(rateLimiter.Middleware())
-	
+
 	// 3. Performance optimizations
-	performanceMiddlewares := middleware.PerformanceMiddleware()
-	for _, middleware := range performanceMiddlewares {
-		app.fiber.Use(middleware)
-	}
-	
+	responseOptimizer := middleware.NewResponseOptimizer()
+	app.fiber.Use(responseOptimizer.OptimizeResponse)
+
 	// 4. Monitoring and metrics
 	app.fiber.Use(app.monitoring.Middleware())
-	
+
 	// 5. Request ID for tracing
 	app.fiber.Use(requestid.New())
-	
+
 	// 6. Logger with security context
 	app.fiber.Use(logger.New(logger.Config{
 		Format: "${time} ${status} - ${method} ${path} ${latency} - IP: ${ip} - UA: ${ua}\n",
 	}))
-	
+
 	// 7. Panic recovery
 	app.fiber.Use(recover.New())
-	
+
 	// 8. CORS with secure configuration
 	app.fiber.Use(cors.New(cors.Config{
 		AllowOrigins:     strings.Join(app.config.Server.AllowedOrigins, ","),
@@ -276,24 +274,20 @@ func (app *App) initFiber() {
 		AllowCredentials: true,
 		MaxAge:           86400, // 24 hours
 	}))
-	
-	// 9. Response optimization
-	responseOptimizer := middleware.NewResponseOptimizer()
-	app.fiber.Use(responseOptimizer.OptimizeResponse)
-	
-	// 10. Input validation middleware for all routes
+
+	// 9. Input validation middleware for all routes
 	app.fiber.Use(middleware.ValidationMiddleware())
-	
-	// 11. SQL injection protection
+
+	// 10. SQL injection protection
 	app.fiber.Use(middleware.SQLSecurityMiddleware())
-	
-	// 12. CSRF protection
+
+	// 11. CSRF protection
 	app.fiber.Use(middleware.CSRFProtection())
-	
-	// 13. Configuration security
+
+	// 12. Configuration security
 	app.fiber.Use(middleware.ConfigSecurityMiddleware())
-	
-	// 14. Secure logging (prevents sensitive data leakage)
+
+	// 13. Secure logging (prevents sensitive data leakage)
 	app.fiber.Use(middleware.SecureLoggingMiddleware())
 
 	zlog.Info().Msg("Fiber application initialized")
@@ -363,7 +357,7 @@ func (app *App) setupRoutes() {
 
 	// Web routes (HTML responses)
 	web := app.fiber.Group("/")
-	
+
 	// Public routes
 	web.Get("/", func(c *fiber.Ctx) error {
 		return c.Redirect("/dashboard")
@@ -376,7 +370,7 @@ func (app *App) setupRoutes() {
 		jwtMiddleware.ClearTokenCookie(c)
 		return c.Redirect("/login")
 	})
-	
+
 	// Protected web routes
 	webProtected := web.Group("", jwtMiddleware.Protect())
 	webProtected.Get("/dashboard", dashboardHandler.DashboardPage)

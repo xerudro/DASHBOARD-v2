@@ -2,8 +2,10 @@ package models
 
 // ServerWithMetrics combines server and its latest metrics
 type ServerWithMetrics struct {
-	Server  *Server        `json:"server"`
-	Metrics *ServerMetrics `json:"metrics,omitempty"`
+	Server       *Server        `json:"server"`
+	Metrics      *ServerMetrics `json:"metrics,omitempty"`
+	ProviderName string         `json:"provider_name,omitempty"`
+	ProviderType string         `json:"provider_type,omitempty"`
 }
 
 // GetCPUDisplay returns CPU usage with N/A fallback
@@ -44,4 +46,15 @@ func (swm *ServerWithMetrics) GetHealthStatus() string {
 		return "Unknown"
 	}
 	return swm.Metrics.GetHealthStatus()
+}
+
+// GetProviderDisplay returns provider display name with fallback
+func (swm *ServerWithMetrics) GetProviderDisplay() string {
+	if swm.ProviderName != "" {
+		return swm.ProviderName
+	}
+	if swm.ProviderType != "" {
+		return swm.ProviderType
+	}
+	return "N/A"
 }

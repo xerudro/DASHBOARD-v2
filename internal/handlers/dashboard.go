@@ -31,11 +31,11 @@ func NewDashboardHandler(userRepo *repository.UserRepository, serverRepo *reposi
 // DashboardStats represents dashboard statistics
 type DashboardStats struct {
 	Servers struct {
-		Total       int            `json:"total"`
-		Ready       int            `json:"ready"`
-		Provisioning int           `json:"provisioning"`
-		Failed      int            `json:"failed"`
-		ByProvider  map[string]int `json:"by_provider"`
+		Total        int            `json:"total"`
+		Ready        int            `json:"ready"`
+		Provisioning int            `json:"provisioning"`
+		Failed       int            `json:"failed"`
+		ByProvider   map[string]int `json:"by_provider"`
 	} `json:"servers"`
 	Users struct {
 		Total  int `json:"total"`
@@ -47,7 +47,7 @@ type DashboardStats struct {
 // ActivityItem represents a recent activity
 type ActivityItem struct {
 	ID          uuid.UUID `json:"id"`
-	Type        string    `json:"type"`        // server_created, user_login, etc.
+	Type        string    `json:"type"` // server_created, user_login, etc.
 	Description string    `json:"description"`
 	UserEmail   string    `json:"user_email,omitempty"`
 	Timestamp   time.Time `json:"timestamp"`
@@ -191,7 +191,7 @@ func (h *DashboardHandler) getDashboardStats(ctx context.Context, tenantID uuid.
 
 	// Initialize provider counts (would be implemented with proper queries)
 	stats.Servers.ByProvider = make(map[string]int)
-	
+
 	// Get user counts (only for admins)
 	if middleware.IsAdmin(role) {
 		totalUsers, err := h.userRepo.CountByTenant(ctx, tenantID)
@@ -241,7 +241,7 @@ func (h *DashboardHandler) getRecentServers(ctx context.Context, tenantID uuid.U
 		summary := &ServerSummary{
 			ID:       swm.Server.ID,
 			Name:     swm.Server.Name,
-			Provider: swm.Server.ProviderID.String(), // Using ProviderID since Provider field doesn't exist
+			Provider: swm.GetProviderDisplay(),
 			Region:   region,
 			Status:   swm.GetStatusDisplay(),
 			CPU:      swm.GetCPUDisplay(),

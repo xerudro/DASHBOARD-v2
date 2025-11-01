@@ -47,7 +47,7 @@ func CSRFProtection(config ...CSRFConfig) fiber.Handler {
 		if c.Method() == "GET" || c.Method() == "HEAD" || c.Method() == "OPTIONS" {
 			// Generate token for safe methods
 			token := generateCSRFToken(cfg.TokenLength)
-			
+
 			// Set cookie
 			c.Cookie(&fiber.Cookie{
 				Name:     cfg.CookieName,
@@ -57,24 +57,24 @@ func CSRFProtection(config ...CSRFConfig) fiber.Handler {
 				HTTPOnly: cfg.CookieHTTPOnly,
 				SameSite: cfg.CookieSameSite,
 			})
-			
+
 			// Set header for JavaScript access
 			c.Set("X-CSRF-Token", token)
-			
+
 			return c.Next()
 		}
 
 		// For unsafe methods, verify token
 		cookieToken := c.Cookies(cfg.CookieName)
 		headerToken := c.Get("X-CSRF-Token")
-		
+
 		if cookieToken == "" || headerToken == "" {
 			log.Warn().
 				Str("ip", c.IP()).
 				Str("path", c.Path()).
 				Str("method", c.Method()).
 				Msg("CSRF token missing")
-			
+
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"error": "CSRF token missing",
 			})
@@ -86,7 +86,7 @@ func CSRFProtection(config ...CSRFConfig) fiber.Handler {
 				Str("path", c.Path()).
 				Str("method", c.Method()).
 				Msg("CSRF token mismatch")
-			
+
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"error": "CSRF token invalid",
 			})
@@ -113,19 +113,19 @@ func ConfigSecurityMiddleware() fiber.Handler {
 		// Prevent information disclosure
 		c.Set("Server", "VIP-Panel")
 		c.Set("X-Powered-By", "")
-		
+
 		// Content type security
 		if c.Get("Content-Type") == "" {
 			c.Set("Content-Type", "application/json")
 		}
-		
+
 		// Additional security headers for configuration endpoints
 		if contains(c.Path(), []string{"/api/config", "/api/settings"}) {
 			c.Set("Cache-Control", "no-store, no-cache, must-revalidate")
 			c.Set("Pragma", "no-cache")
 			c.Set("Expires", "0")
 		}
-		
+
 		return c.Next()
 	}
 }
@@ -150,13 +150,16 @@ func SecureLoggingMiddleware() fiber.Handler {
 		"password", "token", "secret", "key", "authorization",
 		"x-api-key", "x-auth-token", "cookie", "session",
 	}
-	
+
 	return func(c *fiber.Ctx) error {
 		// Store original headers for logging
 		headers := make(map[string]string)
-		reqHeaders := c.GetReqHeaders()
-		for key, values := range reqHeaders {
-			keyLower := strings.ToLower(key)
+
+		// Get headers using fasthttp method
+		c.Request().Header.VisitAll(func(key, value []byte) {
+			keyStr := string(key)
+			valueStr := string(value)
+			keyLower := strings.ToLower(keyStr)
 
 			// Check if header contains sensitive information
 			isSensitive := false
@@ -168,16 +171,15 @@ func SecureLoggingMiddleware() fiber.Handler {
 			}
 
 			if isSensitive {
-				headers[key] = "[REDACTED]"
+				headers[keyStr] = "[REDACTED]"
 			} else {
-				// Join multiple values with comma
-				headers[key] = strings.Join(values, ", ")
+				headers[keyStr] = valueStr
 			}
-		}
-		
+		})
+
 		// Continue processing
 		err := c.Next()
-		
+
 		// Log request (excluding sensitive data)
 		log.Info().
 			Str("method", c.Method()).
@@ -187,7 +189,7 @@ func SecureLoggingMiddleware() fiber.Handler {
 			Int("status", c.Response().StatusCode()).
 			Interface("headers", headers).
 			Msg("Request processed")
-		
+
 		return err
 	}
 }

@@ -314,8 +314,10 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 		SELECT s.id, s.tenant_id, s.provider_id, s.name, s.hostname, s.ip_address, s.provider_server_id,
 		       s.region, s.size, s.os, s.status, s.ssh_port, s.ssh_key, s.specs, s.tags,
 		       s.created_at, s.updated_at, s.provisioned_at, s.deleted_at,
+		       p.name as provider_name, p.type as provider_type,
 		       m.cpu_percent, m.load_average
 		FROM servers s
+		LEFT JOIN providers p ON s.provider_id = p.id
 		LEFT JOIN (
 			SELECT DISTINCT ON (server_id) server_id, cpu_percent, load_average
 			FROM server_metrics
@@ -338,13 +340,14 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 		metrics := &models.ServerMetrics{}
 
 		var cpuPercent, loadAverage sql.NullFloat64
+		var providerName, providerType sql.NullString
 
 		err := rows.Scan(
 			&server.ID, &server.TenantID, &server.ProviderID, &server.Name, &server.Hostname,
 			&server.IPAddress, &server.ProviderServerID, &server.Region, &server.Size,
 			&server.OS, &server.Status, &server.SSHPort, &server.SSHKey, &server.Specs,
 			&server.Tags, &server.CreatedAt, &server.UpdatedAt, &server.ProvisionedAt,
-			&server.DeletedAt, &cpuPercent, &loadAverage,
+			&server.DeletedAt, &providerName, &providerType, &cpuPercent, &loadAverage,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan server with metrics: %w", err)
@@ -368,8 +371,10 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 		}
 
 		serverWithMetrics := &models.ServerWithMetrics{
-			Server:  server,
-			Metrics: metrics,
+			Server:       server,
+			Metrics:      metrics,
+			ProviderName: providerName.String,
+			ProviderType: providerType.String,
 		}
 
 		servers = append(servers, serverWithMetrics)
@@ -385,10 +390,11 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 // GetByExternalID retrieves a server by external provider ID
 func (r *ServerRepository) GetByExternalID(ctx context.Context, tenantID uuid.UUID, externalID string) (*models.Server, error) {
 	query := `
-		SELECT id, tenant_id, name, provider, region, plan, external_id, ip_address, 
-		       status, specs, created_at, updated_at
+		SELECT id, tenant_id, provider_id, name, hostname, ip_address, provider_server_id,
+		       region, size, os, status, ssh_port, ssh_key, specs, tags,
+		       created_at, updated_at, provisioned_at, deleted_at
 		FROM servers 
-		WHERE tenant_id = $1 AND external_id = $2
+		WHERE tenant_id = $1 AND provider_server_id = $2
 	`
 
 	server := &models.Server{}
