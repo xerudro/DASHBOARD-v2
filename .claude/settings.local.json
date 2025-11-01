@@ -10,7 +10,8 @@
       "Bash(npm update:*)",
       "Bash(npm install)",
       "Bash(go mod tidy:*)",
-      "Bash(go build:*)"
+      "Bash(go build:*)",
+      "Bash(go doc:*)"
     ],
     "deny": [],
     "ask": []

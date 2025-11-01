@@ -24,7 +24,6 @@ import (
 	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
 	"github.com/xerudro/DASHBOARD-v2/internal/monitoring"
 	"github.com/xerudro/DASHBOARD-v2/internal/repository"
-	"github.com/xerudro/DASHBOARD-v2/internal/services"
 )
 
 // App holds the application dependencies
@@ -244,9 +243,10 @@ func (app *App) initFiber() {
 	// Add middleware stack in correct order
 	// 1. Security headers (first for maximum coverage)
 	app.fiber.Use(middleware.SecurityHeaders())
-	
+
 	// 2. Rate limiting (early to protect against abuse)
-	app.fiber.Use(middleware.RateLimit())
+	rateLimiter := middleware.NewRateLimiter(100, time.Minute) // 100 requests per minute
+	app.fiber.Use(rateLimiter.Middleware())
 	
 	// 3. Performance optimizations
 	performanceMiddlewares := middleware.PerformanceMiddleware()
@@ -270,9 +270,9 @@ func (app *App) initFiber() {
 	
 	// 8. CORS with secure configuration
 	app.fiber.Use(cors.New(cors.Config{
-		AllowOrigins:     app.config.Server.AllowedOrigins,
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
+		AllowOrigins:     strings.Join(app.config.Server.AllowedOrigins, ","),
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With",
 		AllowCredentials: true,
 		MaxAge:           86400, // 24 hours
 	}))
@@ -282,7 +282,7 @@ func (app *App) initFiber() {
 	app.fiber.Use(responseOptimizer.OptimizeResponse)
 	
 	// 10. Input validation middleware for all routes
-	app.fiber.Use(middleware.ValidateInput())
+	app.fiber.Use(middleware.ValidationMiddleware())
 	
 	// 11. SQL injection protection
 	app.fiber.Use(middleware.SQLSecurityMiddleware())

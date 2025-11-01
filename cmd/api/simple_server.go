@@ -1,3 +1,5 @@
+//go:build simplehttp
+
 package main
 
 import (
