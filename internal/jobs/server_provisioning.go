@@ -9,7 +9,6 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 	"github.com/xerudro/DASHBOARD-v2/internal/audit"
-	"github.com/xerudro/DASHBOARD-v2/internal/models"
 	"github.com/xerudro/DASHBOARD-v2/internal/repository"
 	"github.com/xerudro/DASHBOARD-v2/internal/services/providers"
 )
