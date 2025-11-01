@@ -368,7 +368,7 @@ func BenchmarkEnhancedRateLimiter(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		req := httptest.NewRequest("GET", "/bench", nil)
-		req.Header.Set("X-Forwarded-For", fmt.Sprintf("192.168.1.%d", i%255))
+		req.Header.Set("X-Forwarded-For", fmt.Sprintf("192.168.1.%d", (i%254)+1))
 		resp, _ := app.Test(req, -1)
 		resp.Body.Close()
 
