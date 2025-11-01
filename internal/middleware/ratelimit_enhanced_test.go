@@ -19,7 +19,7 @@ func TestEnhancedRateLimiter(t *testing.T) {
 		DB:   15, // Use a test database
 	})
 
-	ctx := redisClient.Context()
+	ctx := context.Background()
 	if err := redisClient.Ping(ctx).Err(); err != nil {
 		t.Skipf("Redis not available: %v", err)
 	}
@@ -332,8 +332,6 @@ func TestExpensiveEndpointDetection(t *testing.T) {
 	}
 
 	// We can't directly test the private function, but we can test the behavior
-	app := fiber.New()
-	
 	// This test would require access to the private function or behavioral testing
 	// For now, we'll document expected behavior
 	for _, tc := range testCases {
@@ -349,7 +347,7 @@ func BenchmarkEnhancedRateLimiter(b *testing.B) {
 		DB:   15,
 	})
 
-	ctx := redisClient.Context()
+	ctx := context.Background()
 	if err := redisClient.Ping(ctx).Err(); err != nil {
 		b.Skipf("Redis not available: %v", err)
 	}

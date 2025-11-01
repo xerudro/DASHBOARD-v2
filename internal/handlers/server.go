@@ -75,7 +75,7 @@ func (h *ServerHandler) List(c *fiber.Ctx) error {
 	// Convert to response format
 	responses := make([]*ServerResponse, len(serversWithMetrics))
 	for i, swm := range serversWithMetrics {
-		responses[i] = serverToResponse(&swm.Server, swm.Metrics)
+		responses[i] = serverToResponse(swm.Server, swm.Metrics)
 	}
 
 	// Get total count for pagination

@@ -61,8 +61,8 @@ func (h *UserHandler) List(c *fiber.Ctx) error {
 		responses[i] = UserResponse{
 			ID:        user.ID,
 			Email:     user.Email,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
+			FirstName: user.Name, // User model has Name field, not FirstName/LastName
+			LastName:  "",        // User model has Name field, not FirstName/LastName
 			Role:      user.Role,
 			Status:    user.Status,
 		}
@@ -104,8 +104,8 @@ func (h *UserHandler) GetProfile(c *fiber.Ctx) error {
 	response := UserResponse{
 		ID:        user.ID,
 		Email:     user.Email,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
+		FirstName: user.Name, // User model has Name field, not FirstName/LastName
+		LastName:  "",        // User model has Name field, not FirstName/LastName
 		Role:      user.Role,
 		Status:    user.Status,
 	}
@@ -141,12 +141,16 @@ func (h *UserHandler) UpdateProfile(c *fiber.Ctx) error {
 		})
 	}
 
-	// Update fields
-	if req.FirstName != "" {
-		user.FirstName = req.FirstName
-	}
-	if req.LastName != "" {
-		user.LastName = req.LastName
+	// Update fields - combine first and last name into Name field
+	if req.FirstName != "" || req.LastName != "" {
+		// If both provided, combine them
+		if req.FirstName != "" && req.LastName != "" {
+			user.Name = req.FirstName + " " + req.LastName
+		} else if req.FirstName != "" {
+			user.Name = req.FirstName
+		} else {
+			user.Name = req.LastName
+		}
 	}
 
 	if err := h.userRepo.Update(ctx, user); err != nil {
@@ -160,8 +164,8 @@ func (h *UserHandler) UpdateProfile(c *fiber.Ctx) error {
 	response := UserResponse{
 		ID:        user.ID,
 		Email:     user.Email,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
+		FirstName: user.Name, // User model has Name field, not FirstName/LastName
+		LastName:  "",        // User model has Name field, not FirstName/LastName
 		Role:      user.Role,
 		Status:    user.Status,
 	}
