@@ -26,8 +26,10 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 // Create creates a new user
 func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	query := `
-		INSERT INTO users (id, tenant_id, email, password_hash, first_name, last_name, role, status, two_factor_enabled, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		INSERT INTO users (id, tenant_id, email, password_hash, name, role, status,
+		                   email_verified, two_factor_enabled, two_factor_secret,
+		                   last_login_at, created_at, updated_at, deleted_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 	`
 
 	now := time.Now()
@@ -40,13 +42,16 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 		user.TenantID,
 		user.Email,
 		user.PasswordHash,
-		user.FirstName,
-		user.LastName,
+		user.Name,
 		user.Role,
 		user.Status,
+		user.EmailVerified,
 		user.TwoFactorEnabled,
+		user.TwoFactorSecret,
+		user.LastLoginAt,
 		user.CreatedAt,
 		user.UpdatedAt,
+		user.DeletedAt,
 	)
 
 	if err != nil {
@@ -121,9 +126,10 @@ func (r *UserRepository) GetByTenant(ctx context.Context, tenantID uuid.UUID, li
 // Update updates a user
 func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
 	query := `
-		UPDATE users 
-		SET email = $2, first_name = $3, last_name = $4, role = $5, status = $6, 
-		    two_factor_enabled = $7, updated_at = $8
+		UPDATE users
+		SET email = $2, name = $3, role = $4, status = $5,
+		    email_verified = $6, two_factor_enabled = $7, two_factor_secret = $8,
+		    last_login_at = $9, updated_at = $10, deleted_at = $11
 		WHERE id = $1
 	`
 
@@ -132,12 +138,15 @@ func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
 	result, err := r.db.ExecContext(ctx, query,
 		user.ID,
 		user.Email,
-		user.FirstName,
-		user.LastName,
+		user.Name,
 		user.Role,
 		user.Status,
+		user.EmailVerified,
 		user.TwoFactorEnabled,
+		user.TwoFactorSecret,
+		user.LastLoginAt,
 		user.UpdatedAt,
+		user.DeletedAt,
 	)
 
 	if err != nil {

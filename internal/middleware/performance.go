@@ -235,8 +235,8 @@ func (mo *MemoryOptimizer) OptimizeMemory() fiber.Handler {
 		c.Request().SetBodyStream(io.LimitReader(
 			c.Request().BodyStream(),
 			mo.maxResponseSize,
-		))
-		
+		), int(mo.maxResponseSize))
+
 		return c.Next()
 	}
 }

@@ -178,7 +178,7 @@ func (rv *RequestValidator) validateBodySize(c *fiber.Ctx) error {
 
 	// Also limit the actual body reading
 	if contentLength > 0 {
-		c.Request().SetBodyStream(io.LimitReader(c.Request().BodyStream(), rv.maxBodySize))
+		c.Request().SetBodyStream(io.LimitReader(c.Request().BodyStream(), rv.maxBodySize), int(rv.maxBodySize))
 	}
 
 	return nil

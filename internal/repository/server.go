@@ -26,9 +26,10 @@ func NewServerRepository(db *sqlx.DB) *ServerRepository {
 // Create creates a new server
 func (r *ServerRepository) Create(ctx context.Context, server *models.Server) error {
 	query := `
-		INSERT INTO servers (id, tenant_id, name, provider, region, plan, external_id, ip_address, 
-		                    status, specs, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		INSERT INTO servers (id, tenant_id, provider_id, name, hostname, ip_address,
+		                    provider_server_id, region, size, os, status, ssh_port, ssh_key,
+		                    specs, tags, created_at, updated_at, provisioned_at, deleted_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
 	`
 
 	now := time.Now()
@@ -39,16 +40,23 @@ func (r *ServerRepository) Create(ctx context.Context, server *models.Server) er
 	_, err := r.db.ExecContext(ctx, query,
 		server.ID,
 		server.TenantID,
+		server.ProviderID,
 		server.Name,
-		server.Provider,
-		server.Region,
-		server.Plan,
-		server.ExternalID,
+		server.Hostname,
 		server.IPAddress,
+		server.ProviderServerID,
+		server.Region,
+		server.Size,
+		server.OS,
 		server.Status,
+		server.SSHPort,
+		server.SSHKey,
 		server.Specs,
+		server.Tags,
 		server.CreatedAt,
 		server.UpdatedAt,
+		server.ProvisionedAt,
+		server.DeletedAt,
 	)
 
 	if err != nil {
@@ -61,9 +69,10 @@ func (r *ServerRepository) Create(ctx context.Context, server *models.Server) er
 // GetByID retrieves a server by ID
 func (r *ServerRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.Server, error) {
 	query := `
-		SELECT id, tenant_id, name, provider, region, plan, external_id, ip_address, 
-		       status, specs, created_at, updated_at
-		FROM servers 
+		SELECT id, tenant_id, provider_id, name, hostname, ip_address, provider_server_id,
+		       region, size, os, status, ssh_port, ssh_key, specs, tags,
+		       created_at, updated_at, provisioned_at, deleted_at
+		FROM servers
 		WHERE id = $1
 	`
 
@@ -82,8 +91,9 @@ func (r *ServerRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.S
 // GetByTenant retrieves servers by tenant ID with N/A fallback
 func (r *ServerRepository) GetByTenant(ctx context.Context, tenantID uuid.UUID, limit, offset int) ([]*models.Server, error) {
 	query := `
-		SELECT s.id, s.tenant_id, s.name, s.provider, s.region, s.plan, s.external_id, 
-		       s.ip_address, s.status, s.specs, s.created_at, s.updated_at
+		SELECT s.id, s.tenant_id, s.provider_id, s.name, s.hostname, s.ip_address, s.provider_server_id,
+		       s.region, s.size, s.os, s.status, s.ssh_port, s.ssh_key, s.specs, s.tags,
+		       s.created_at, s.updated_at, s.provisioned_at, s.deleted_at
 		FROM servers s
 		WHERE s.tenant_id = $1
 		ORDER BY s.created_at DESC
@@ -98,8 +108,9 @@ func (r *ServerRepository) GetByTenant(ctx context.Context, tenantID uuid.UUID, 
 
 	// Apply N/A fallback pattern for each server
 	for _, server := range servers {
-		if server.IPAddress == "" {
-			server.IPAddress = "N/A"
+		if server.IPAddress == nil || *server.IPAddress == "" {
+			na := "N/A"
+			server.IPAddress = &na
 		}
 		if server.Status == "" {
 			server.Status = models.ServerStatusUnknown
@@ -131,9 +142,10 @@ func (r *ServerRepository) GetByProvider(ctx context.Context, tenantID uuid.UUID
 // GetByStatus retrieves servers by status
 func (r *ServerRepository) GetByStatus(ctx context.Context, tenantID uuid.UUID, status string) ([]*models.Server, error) {
 	query := `
-		SELECT id, tenant_id, name, provider, region, plan, external_id, ip_address, 
-		       status, specs, created_at, updated_at
-		FROM servers 
+		SELECT id, tenant_id, provider_id, name, hostname, ip_address, provider_server_id,
+		       region, size, os, status, ssh_port, ssh_key, specs, tags,
+		       created_at, updated_at, provisioned_at, deleted_at
+		FROM servers
 		WHERE tenant_id = $1 AND status = $2
 		ORDER BY created_at DESC
 	`
@@ -150,9 +162,10 @@ func (r *ServerRepository) GetByStatus(ctx context.Context, tenantID uuid.UUID, 
 // Update updates a server
 func (r *ServerRepository) Update(ctx context.Context, server *models.Server) error {
 	query := `
-		UPDATE servers 
-		SET name = $2, provider = $3, region = $4, plan = $5, external_id = $6, 
-		    ip_address = $7, status = $8, specs = $9, updated_at = $10
+		UPDATE servers
+		SET provider_id = $2, name = $3, hostname = $4, ip_address = $5, provider_server_id = $6,
+		    region = $7, size = $8, os = $9, status = $10, ssh_port = $11, ssh_key = $12,
+		    specs = $13, tags = $14, updated_at = $15, provisioned_at = $16, deleted_at = $17
 		WHERE id = $1
 	`
 
@@ -160,15 +173,22 @@ func (r *ServerRepository) Update(ctx context.Context, server *models.Server) er
 
 	result, err := r.db.ExecContext(ctx, query,
 		server.ID,
+		server.ProviderID,
 		server.Name,
-		server.Provider,
-		server.Region,
-		server.Plan,
-		server.ExternalID,
+		server.Hostname,
 		server.IPAddress,
+		server.ProviderServerID,
+		server.Region,
+		server.Size,
+		server.OS,
 		server.Status,
+		server.SSHPort,
+		server.SSHKey,
 		server.Specs,
+		server.Tags,
 		server.UpdatedAt,
+		server.ProvisionedAt,
+		server.DeletedAt,
 	)
 
 	if err != nil {
@@ -291,18 +311,17 @@ func (r *ServerRepository) CountByStatus(ctx context.Context, tenantID uuid.UUID
 // GetWithMetrics retrieves servers with their latest metrics
 func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUID, limit, offset int) ([]*models.ServerWithMetrics, error) {
 	query := `
-		SELECT s.id, s.tenant_id, s.name, s.provider, s.region, s.plan, s.external_id, 
-		       s.ip_address, s.status, s.specs, s.created_at, s.updated_at,
-		       m.cpu_percent, m.memory_percent, m.disk_percent, m.load_average, 
-		       m.uptime, m.status as metrics_status, m.collected_at
+		SELECT s.id, s.tenant_id, s.provider_id, s.name, s.hostname, s.ip_address, s.provider_server_id,
+		       s.region, s.size, s.os, s.status, s.ssh_port, s.ssh_key, s.specs, s.tags,
+		       s.created_at, s.updated_at, s.provisioned_at, s.deleted_at,
+		       m.cpu_percent, m.load_average
 		FROM servers s
 		LEFT JOIN (
-			SELECT DISTINCT ON (server_id) server_id, cpu_percent, memory_percent, 
-			       disk_percent, load_average, uptime, status, collected_at
-			FROM server_metrics 
-			ORDER BY server_id, collected_at DESC
+			SELECT DISTINCT ON (server_id) server_id, cpu_percent, load_average
+			FROM server_metrics
+			ORDER BY server_id, time DESC
 		) m ON s.id = m.server_id
-		WHERE s.tenant_id = $1 AND s.status != $2
+		WHERE s.tenant_id = $1 AND (s.deleted_at IS NULL OR s.status != $2)
 		ORDER BY s.created_at DESC
 		LIMIT $3 OFFSET $4
 	`
@@ -317,36 +336,32 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 	for rows.Next() {
 		server := &models.Server{}
 		metrics := &models.ServerMetrics{}
-		
-		var cpuPercent, memoryPercent, diskPercent, loadAverage, uptime sql.NullFloat64
-		var metricsStatus sql.NullString
-		var collectedAt sql.NullTime
+
+		var cpuPercent, loadAverage sql.NullFloat64
 
 		err := rows.Scan(
-			&server.ID, &server.TenantID, &server.Name, &server.Provider, &server.Region,
-			&server.Plan, &server.ExternalID, &server.IPAddress, &server.Status,
-			&server.Specs, &server.CreatedAt, &server.UpdatedAt,
-			&cpuPercent, &memoryPercent, &diskPercent, &loadAverage, &uptime,
-			&metricsStatus, &collectedAt,
+			&server.ID, &server.TenantID, &server.ProviderID, &server.Name, &server.Hostname,
+			&server.IPAddress, &server.ProviderServerID, &server.Region, &server.Size,
+			&server.OS, &server.Status, &server.SSHPort, &server.SSHKey, &server.Specs,
+			&server.Tags, &server.CreatedAt, &server.UpdatedAt, &server.ProvisionedAt,
+			&server.DeletedAt, &cpuPercent, &loadAverage,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan server with metrics: %w", err)
 		}
 
 		// Apply N/A fallback pattern
-		if server.IPAddress == "" {
-			server.IPAddress = "N/A"
+		if server.IPAddress == nil || *server.IPAddress == "" {
+			na := "N/A"
+			server.IPAddress = &na
 		}
 
 		// Handle metrics with N/A fallback
 		if cpuPercent.Valid {
-			metrics.CPUPercent = cpuPercent.Float64
-			metrics.MemoryPercent = memoryPercent.Float64
-			metrics.DiskPercent = diskPercent.Float64
-			metrics.LoadAverage = loadAverage.Float64
-			metrics.Uptime = uptime.Float64
-			metrics.Status = metricsStatus.String
-			metrics.CollectedAt = collectedAt.Time
+			metrics.CPUPercent = &cpuPercent.Float64
+			metrics.LoadAverage = &loadAverage.Float64
+			metrics.ServerID = server.ID
+			metrics.Time = time.Now()
 		} else {
 			// No metrics available - use N/A pattern
 			metrics = nil

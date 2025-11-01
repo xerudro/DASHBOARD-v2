@@ -40,6 +40,8 @@ const (
 	ServerStatusFailed       = "failed"
 	ServerStatusStopped      = "stopped"
 	ServerStatusTerminated   = "terminated"
+	ServerStatusUnknown      = "unknown"
+	ServerStatusDeleted      = "deleted"
 )
 
 // ServerSpecs represents server specifications

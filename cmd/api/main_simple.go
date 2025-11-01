@@ -1,3 +1,5 @@
+//go:build simple
+
 package main
 
 import (
@@ -49,11 +51,11 @@ func main() {
 			})
 		}
 
-		email, _ := loginData["email"].(string)
-		password, _ := loginData["password"].(string)
+		email, emailOk := loginData["email"].(string)
+		password, passwordOk := loginData["password"].(string)
 
 		// Basic validation
-		if email == "" || password == "" {
+		if !emailOk || !passwordOk || email == "" || password == "" {
 			return c.Status(400).JSON(fiber.Map{
 				"success": false,
 				"message": "Email and password are required",
@@ -72,16 +74,16 @@ func main() {
 		var registerData map[string]interface{}
 		if err := c.BodyParser(&registerData); err != nil {
 			return c.Status(400).JSON(fiber.Map{
-				"success": false,  
+				"success": false,
 				"message": "Invalid request body",
 			})
 		}
 
-		email, _ := registerData["email"].(string)
-		password, _ := registerData["password"].(string)
+		email, emailOk := registerData["email"].(string)
+		password, passwordOk := registerData["password"].(string)
 
 		// Basic validation
-		if email == "" || password == "" {
+		if !emailOk || !passwordOk || email == "" || password == "" {
 			return c.Status(400).JSON(fiber.Map{
 				"success": false,
 				"message": "Email and password are required",

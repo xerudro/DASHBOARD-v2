@@ -17,14 +17,14 @@
   "author": "VIP Hosting Panel Team",
   "license": "MIT",
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.10",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32",
-    "tailwindcss": "^3.4.0"
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
   },
   "dependencies": {
-    "alpinejs": "^3.13.3",
-    "htmx.org": "^1.9.10"
+    "alpinejs": "^3.15.0",
+    "htmx.org": "^2.0.8"
   }
 }

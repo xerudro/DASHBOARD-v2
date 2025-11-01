@@ -3,7 +3,14 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(cd:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(go version:*)",
+      "Bash(mcp list:*)",
+      "Bash(go get:*)",
+      "Bash(npm update:*)",
+      "Bash(npm install)",
+      "Bash(go mod tidy:*)",
+      "Bash(go build:*)"
     ],
     "deny": [],
     "ask": []

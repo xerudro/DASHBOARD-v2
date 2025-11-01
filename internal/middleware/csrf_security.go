@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -154,9 +154,10 @@ func SecureLoggingMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Store original headers for logging
 		headers := make(map[string]string)
-		c.GetReqHeaders(func(key, value string) {
+		reqHeaders := c.GetReqHeaders()
+		for key, values := range reqHeaders {
 			keyLower := strings.ToLower(key)
-			
+
 			// Check if header contains sensitive information
 			isSensitive := false
 			for _, field := range sensitiveFields {
@@ -165,13 +166,14 @@ func SecureLoggingMiddleware() fiber.Handler {
 					break
 				}
 			}
-			
+
 			if isSensitive {
 				headers[key] = "[REDACTED]"
 			} else {
-				headers[key] = value
+				// Join multiple values with comma
+				headers[key] = strings.Join(values, ", ")
 			}
-		})
+		}
 		
 		// Continue processing
 		err := c.Next()
