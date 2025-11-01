@@ -247,13 +247,7 @@ func (h *DashboardHandler) getRecentServers(ctx context.Context, tenantID uuid.U
 			CPU:      swm.GetCPUDisplay(),
 			RAM:      swm.GetMemoryDisplay(),
 			Disk:     swm.GetDiskDisplay(),
-			Uptime:   "N/A", // Would be calculated from metrics
-		}
-
-		// Set uptime if metrics available
-		if swm.Metrics != nil && swm.Metrics.Uptime > 0 {
-			uptime := time.Duration(swm.Metrics.Uptime * float64(time.Second))
-			summary.Uptime = formatUptime(uptime)
+			Uptime:   "N/A", // Uptime field not available in ServerMetrics
 		}
 
 		summaries[i] = summary
