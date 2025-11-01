@@ -232,11 +232,17 @@ func (h *DashboardHandler) getRecentServers(ctx context.Context, tenantID uuid.U
 
 	summaries := make([]*ServerSummary, len(serversWithMetrics))
 	for i, swm := range serversWithMetrics {
+		// Helper function to safely get string from pointer
+		region := "N/A"
+		if swm.Server.Region != nil {
+			region = *swm.Server.Region
+		}
+
 		summary := &ServerSummary{
 			ID:       swm.Server.ID,
 			Name:     swm.Server.Name,
-			Provider: swm.Server.Provider,
-			Region:   swm.Server.Region,
+			Provider: swm.Server.ProviderID.String(), // Using ProviderID since Provider field doesn't exist
+			Region:   region,
 			Status:   swm.GetStatusDisplay(),
 			CPU:      swm.GetCPUDisplay(),
 			RAM:      swm.GetMemoryDisplay(),

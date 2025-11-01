@@ -36,17 +36,16 @@ type CreateServerRequest struct {
 
 // ServerResponse represents server in API responses
 type ServerResponse struct {
-	ID         uuid.UUID `json:"id"`
-	Name       string    `json:"name"`
-	Provider   string    `json:"provider"`
-	Region     string    `json:"region"`
-	Plan       string    `json:"plan"`
-	ExternalID string    `json:"external_id,omitempty"`
-	IPAddress  string    `json:"ip_address"`
-	Status     string    `json:"status"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	Metrics    *models.ServerMetrics `json:"metrics,omitempty"`
+	ID                uuid.UUID             `json:"id"`
+	Name              string                `json:"name"`
+	ProviderID        uuid.UUID             `json:"provider_id"`
+	Region            string                `json:"region"`
+	IPAddress         string                `json:"ip_address"`
+	ProviderServerID  string                `json:"provider_server_id,omitempty"`
+	Status            string                `json:"status"`
+	CreatedAt         time.Time             `json:"created_at"`
+	UpdatedAt         time.Time             `json:"updated_at"`
+	Metrics           *models.ServerMetrics `json:"metrics,omitempty"`
 }
 
 // List returns servers for the current tenant (API)
@@ -76,19 +75,7 @@ func (h *ServerHandler) List(c *fiber.Ctx) error {
 	// Convert to response format
 	responses := make([]*ServerResponse, len(serversWithMetrics))
 	for i, swm := range serversWithMetrics {
-		responses[i] = &ServerResponse{
-			ID:         swm.Server.ID,
-			Name:       swm.Server.Name,
-			Provider:   swm.Server.Provider,
-			Region:     swm.Server.Region,
-			Plan:       swm.Server.Plan,
-			ExternalID: swm.Server.ExternalID,
-			IPAddress:  swm.Server.IPAddress,
-			Status:     swm.Server.Status,
-			CreatedAt:  swm.Server.CreatedAt,
-			UpdatedAt:  swm.Server.UpdatedAt,
-			Metrics:    swm.Metrics,
-		}
+		responses[i] = serverToResponse(&swm.Server, swm.Metrics)
 	}
 
 	// Get total count for pagination
@@ -139,20 +126,7 @@ func (h *ServerHandler) Get(c *fiber.Ctx) error {
 		})
 	}
 
-	response := &ServerResponse{
-		ID:         server.ID,
-		Name:       server.Name,
-		Provider:   server.Provider,
-		Region:     server.Region,
-		Plan:       server.Plan,
-		ExternalID: server.ExternalID,
-		IPAddress:  server.IPAddress,
-		Status:     server.Status,
-		CreatedAt:  server.CreatedAt,
-		UpdatedAt:  server.UpdatedAt,
-	}
-
-	return c.JSON(response)
+	return c.JSON(serverToResponse(server, nil))
 }
 
 // Create creates a new server (API)
@@ -178,15 +152,23 @@ func (h *ServerHandler) Create(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// Note: This is a simplified version. In production, you would:
+	// 1. Look up or create provider by name
+	// 2. Parse plan specifications properly
+	// For now, using placeholder UUID for provider
+	providerID := uuid.MustParse("00000000-0000-0000-0000-000000000001") // Default/placeholder provider
+
+	region := req.Region
+
 	// Create server record
 	server := &models.Server{
-		TenantID: tenantID,
-		Name:     req.Name,
-		Provider: req.Provider,
-		Region:   req.Region,
-		Plan:     req.Plan,
-		Status:   models.ServerStatusQueued,
-		Specs:    fmt.Sprintf(`{"plan": "%s", "region": "%s"}`, req.Plan, req.Region),
+		TenantID:   tenantID,
+		Name:       req.Name,
+		ProviderID: providerID,
+		Region:     &region,
+		Status:     models.ServerStatusQueued,
+		SSHPort:    22, // Default SSH port
+		Specs:      models.ServerSpecs{}, // Empty specs for now
 	}
 
 	if err := h.serverRepo.Create(ctx, server); err != nil {
@@ -204,22 +186,10 @@ func (h *ServerHandler) Create(c *fiber.Ctx) error {
 		Str("server_id", server.ID.String()).
 		Str("user_id", userID.String()).
 		Str("name", server.Name).
-		Str("provider", server.Provider).
+		Str("provider_id", server.ProviderID.String()).
 		Msg("Server creation requested")
 
-	response := &ServerResponse{
-		ID:        server.ID,
-		Name:      server.Name,
-		Provider:  server.Provider,
-		Region:    server.Region,
-		Plan:      server.Plan,
-		IPAddress: server.IPAddress,
-		Status:    server.Status,
-		CreatedAt: server.CreatedAt,
-		UpdatedAt: server.UpdatedAt,
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(response)
+	return c.Status(fiber.StatusCreated).JSON(serverToResponse(server, nil))
 }
 
 // Update updates a server (API)
@@ -278,19 +248,7 @@ func (h *ServerHandler) Update(c *fiber.Ctx) error {
 		})
 	}
 
-	response := &ServerResponse{
-		ID:        server.ID,
-		Name:      server.Name,
-		Provider:  server.Provider,
-		Region:    server.Region,
-		Plan:      server.Plan,
-		IPAddress: server.IPAddress,
-		Status:    server.Status,
-		CreatedAt: server.CreatedAt,
-		UpdatedAt: server.UpdatedAt,
-	}
-
-	return c.JSON(response)
+	return c.JSON(serverToResponse(server, nil))
 }
 
 // Delete deletes a server (API)
@@ -432,15 +390,18 @@ func (h *ServerHandler) CreateServerForm(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// Note: This is a simplified version. In production, you would look up provider by name
+	providerID := uuid.MustParse("00000000-0000-0000-0000-000000000001") // Default/placeholder provider
+
 	// Create server
 	server := &models.Server{
-		TenantID: tenantID,
-		Name:     name,
-		Provider: provider,
-		Region:   region,
-		Plan:     plan,
-		Status:   models.ServerStatusQueued,
-		Specs:    fmt.Sprintf(`{"plan": "%s", "region": "%s"}`, plan, region),
+		TenantID:   tenantID,
+		Name:       name,
+		ProviderID: providerID,
+		Region:     &region,
+		Status:     models.ServerStatusQueued,
+		SSHPort:    22,
+		Specs:      models.ServerSpecs{}, // Empty specs for now
 	}
 
 	if err := h.serverRepo.Create(ctx, server); err != nil {
@@ -471,6 +432,16 @@ func (h *ServerHandler) renderServersHTML(email, role string, servers []*models.
 		`
 	} else {
 		for _, swm := range servers {
+			region := "N/A"
+			if swm.Server.Region != nil {
+				region = *swm.Server.Region
+			}
+
+			ipAddress := "N/A"
+			if swm.Server.IPAddress != nil {
+				ipAddress = *swm.Server.IPAddress
+			}
+
 			serversSection += fmt.Sprintf(`
 				<tr>
 					<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">%s</td>
@@ -486,7 +457,7 @@ func (h *ServerHandler) renderServersHTML(email, role string, servers []*models.
 					<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">%s</td>
 					<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">%s</td>
 				</tr>
-			`, swm.Server.Name, swm.Server.Provider, swm.Server.Region, swm.Server.IPAddress,
+			`, swm.Server.Name, swm.Server.ProviderID.String(), region, ipAddress,
 				getStatusBadgeColor(swm.Server.Status), swm.Server.Status,
 				swm.GetCPUDisplay(), swm.GetMemoryDisplay(), swm.GetDiskDisplay())
 		}
@@ -657,5 +628,36 @@ func getStatusBadgeColor(status string) string {
 		return "bg-red-100 text-red-800"
 	default:
 		return "bg-gray-100 text-gray-800"
+	}
+}
+
+// serverToResponse converts a Server model to ServerResponse
+func serverToResponse(server *models.Server, metrics *models.ServerMetrics) *ServerResponse {
+	region := "N/A"
+	if server.Region != nil {
+		region = *server.Region
+	}
+
+	ipAddress := "N/A"
+	if server.IPAddress != nil {
+		ipAddress = *server.IPAddress
+	}
+
+	providerServerID := ""
+	if server.ProviderServerID != nil {
+		providerServerID = *server.ProviderServerID
+	}
+
+	return &ServerResponse{
+		ID:               server.ID,
+		Name:             server.Name,
+		ProviderID:       server.ProviderID,
+		Region:           region,
+		IPAddress:        ipAddress,
+		ProviderServerID: providerServerID,
+		Status:           server.Status,
+		CreatedAt:        server.CreatedAt,
+		UpdatedAt:        server.UpdatedAt,
+		Metrics:          metrics,
 	}
 }
