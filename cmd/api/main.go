@@ -19,11 +19,13 @@ import (
 	zlog "github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 
+	"github.com/xerudro/DASHBOARD-v2/internal/cache"
 	"github.com/xerudro/DASHBOARD-v2/internal/database"
 	"github.com/xerudro/DASHBOARD-v2/internal/handlers"
 	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
 	"github.com/xerudro/DASHBOARD-v2/internal/monitoring"
 	"github.com/xerudro/DASHBOARD-v2/internal/repository"
+	"github.com/xerudro/DASHBOARD-v2/internal/services"
 )
 
 // App holds the application dependencies
@@ -68,7 +70,7 @@ type Repositories struct {
 
 // Services holds all service instances
 type Services struct {
-	// Add services as needed (provider clients, job queue, etc.)
+	CacheInvalidation *services.CacheInvalidationService
 }
 
 func main() {
@@ -208,8 +210,11 @@ func (app *App) initRepositories() {
 
 // initServices initializes all services
 func (app *App) initServices() {
+	// Initialize Redis cache for dashboard
+	dashboardCache := cache.NewRedisCache(app.db.Redis(), "dashboard:", 30*time.Second)
+
 	app.svcs = &Services{
-		// Initialize services here
+		CacheInvalidation: services.NewCacheInvalidationService(dashboardCache),
 	}
 
 	zlog.Info().Msg("Services initialized")
@@ -335,12 +340,12 @@ func (app *App) setupRoutes() {
 	protected := api.Group("", jwtMiddleware.Protect())
 
 	// Dashboard routes
-	dashboardHandler := handlers.NewDashboardHandler(app.repos.User, app.repos.Server)
+	dashboardHandler := handlers.NewDashboardHandler(app.repos.User, app.repos.Server, app.svcs.CacheInvalidation)
 	protected.Get("/dashboard", dashboardHandler.GetDashboard)
 	protected.Get("/dashboard/stats", dashboardHandler.GetStats)
 
 	// Server routes
-	serverHandler := handlers.NewServerHandler(app.repos.Server)
+	serverHandler := handlers.NewServerHandler(app.repos.Server, app.svcs.CacheInvalidation)
 	servers := protected.Group("/servers")
 	servers.Get("/", serverHandler.List)
 	servers.Post("/", serverHandler.Create)

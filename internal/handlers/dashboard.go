@@ -9,22 +9,32 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
+	"github.com/xerudro/DASHBOARD-v2/internal/cache"
 	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
 	"github.com/xerudro/DASHBOARD-v2/internal/models"
 	"github.com/xerudro/DASHBOARD-v2/internal/repository"
 )
 
+// CacheService interface for cache operations needed by dashboard
+type CacheService interface {
+	Get(ctx context.Context, key string, dest interface{}) (bool, error)
+	Set(ctx context.Context, key string, value interface{}, opts cache.CacheOptions) error
+	InvalidateDashboardStats(ctx context.Context, tenantID uuid.UUID) error
+}
+
 // DashboardHandler handles dashboard endpoints
 type DashboardHandler struct {
-	userRepo   *repository.UserRepository
-	serverRepo *repository.ServerRepository
+	userRepo     *repository.UserRepository
+	serverRepo   *repository.ServerRepository
+	cacheService CacheService
 }
 
 // NewDashboardHandler creates a new dashboard handler
-func NewDashboardHandler(userRepo *repository.UserRepository, serverRepo *repository.ServerRepository) *DashboardHandler {
+func NewDashboardHandler(userRepo *repository.UserRepository, serverRepo *repository.ServerRepository, cacheService CacheService) *DashboardHandler {
 	return &DashboardHandler{
-		userRepo:   userRepo,
-		serverRepo: serverRepo,
+		userRepo:     userRepo,
+		serverRepo:   serverRepo,
+		cacheService: cacheService,
 	}
 }
 
@@ -155,8 +165,32 @@ func (h *DashboardHandler) DashboardPage(c *fiber.Ctx) error {
 	return c.Type("html").SendString(h.renderDashboardHTML(email, role, stats, servers))
 }
 
-// getDashboardStats fetches dashboard statistics with N/A fallbacks
+// getDashboardStats fetches dashboard statistics with Redis caching and N/A fallbacks
 func (h *DashboardHandler) getDashboardStats(ctx context.Context, tenantID uuid.UUID, role string) (*DashboardStats, error) {
+	// Create cache key based on tenant and role (admin sees user counts)
+	cacheKey := fmt.Sprintf("dashboard:stats:%s:%s", tenantID.String(), role)
+
+	// Try to get from cache first
+	if h.cacheService != nil {
+		var cachedStats DashboardStats
+		found, err := h.cacheService.Get(ctx, cacheKey, &cachedStats)
+		if err != nil {
+			log.Warn().Err(err).Str("cache_key", cacheKey).Msg("Cache get error")
+		} else if found {
+			log.Debug().
+				Str("tenant_id", tenantID.String()).
+				Str("role", role).
+				Msg("Dashboard stats served from cache")
+			return &cachedStats, nil
+		}
+	}
+
+	// Cache miss - fetch from database
+	log.Debug().
+		Str("tenant_id", tenantID.String()).
+		Str("role", role).
+		Msg("Dashboard stats cache miss - fetching from database")
+
 	stats := &DashboardStats{}
 
 	// Get server counts with fallbacks
@@ -219,7 +253,38 @@ func (h *DashboardHandler) getDashboardStats(ctx context.Context, tenantID uuid.
 		},
 	}
 
+	// Cache the result for 30 seconds with proper tags for invalidation
+	if h.cacheService != nil {
+		cacheOpts := cache.CacheOptions{
+			TTL:  30 * time.Second, // 30-second cache as per performance requirements
+			Tags: []string{"dashboard", "servers", tenantID.String()},
+		}
+
+		if err := h.cacheService.Set(ctx, cacheKey, stats, cacheOpts); err != nil {
+			log.Error().
+				Err(err).
+				Str("cache_key", cacheKey).
+				Msg("Failed to cache dashboard stats")
+			// Don't return error - we have the data
+		} else {
+			log.Debug().
+				Str("tenant_id", tenantID.String()).
+				Str("role", role).
+				Dur("ttl", cacheOpts.TTL).
+				Msg("Dashboard stats cached successfully")
+		}
+	}
+
 	return stats, nil
+}
+
+// InvalidateDashboardCache invalidates dashboard cache for a tenant
+func (h *DashboardHandler) InvalidateDashboardCache(ctx context.Context, tenantID uuid.UUID) error {
+	if h.cacheService == nil {
+		return nil
+	}
+
+	return h.cacheService.InvalidateDashboardStats(ctx, tenantID)
 }
 
 // getRecentServers fetches recent servers with metrics

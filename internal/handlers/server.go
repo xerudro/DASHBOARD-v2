@@ -16,13 +16,20 @@ import (
 
 // ServerHandler handles server endpoints
 type ServerHandler struct {
-	serverRepo *repository.ServerRepository
+	serverRepo        *repository.ServerRepository
+	cacheInvalidation CacheInvalidationService
+}
+
+// CacheInvalidationService interface for cache invalidation operations
+type CacheInvalidationService interface {
+	InvalidateServerCache(ctx context.Context, tenantID uuid.UUID, serverID *uuid.UUID) error
 }
 
 // NewServerHandler creates a new server handler
-func NewServerHandler(serverRepo *repository.ServerRepository) *ServerHandler {
+func NewServerHandler(serverRepo *repository.ServerRepository, cacheInvalidation CacheInvalidationService) *ServerHandler {
 	return &ServerHandler{
-		serverRepo: serverRepo,
+		serverRepo:        serverRepo,
+		cacheInvalidation: cacheInvalidation,
 	}
 }
 
@@ -36,16 +43,16 @@ type CreateServerRequest struct {
 
 // ServerResponse represents server in API responses
 type ServerResponse struct {
-	ID                uuid.UUID             `json:"id"`
-	Name              string                `json:"name"`
-	ProviderID        uuid.UUID             `json:"provider_id"`
-	Region            string                `json:"region"`
-	IPAddress         string                `json:"ip_address"`
-	ProviderServerID  string                `json:"provider_server_id,omitempty"`
-	Status            string                `json:"status"`
-	CreatedAt         time.Time             `json:"created_at"`
-	UpdatedAt         time.Time             `json:"updated_at"`
-	Metrics           *models.ServerMetrics `json:"metrics,omitempty"`
+	ID               uuid.UUID             `json:"id"`
+	Name             string                `json:"name"`
+	ProviderID       uuid.UUID             `json:"provider_id"`
+	Region           string                `json:"region"`
+	IPAddress        string                `json:"ip_address"`
+	ProviderServerID string                `json:"provider_server_id,omitempty"`
+	Status           string                `json:"status"`
+	CreatedAt        time.Time             `json:"created_at"`
+	UpdatedAt        time.Time             `json:"updated_at"`
+	Metrics          *models.ServerMetrics `json:"metrics,omitempty"`
 }
 
 // List returns servers for the current tenant (API)
@@ -167,7 +174,7 @@ func (h *ServerHandler) Create(c *fiber.Ctx) error {
 		ProviderID: providerID,
 		Region:     &region,
 		Status:     models.ServerStatusQueued,
-		SSHPort:    22, // Default SSH port
+		SSHPort:    22,                   // Default SSH port
 		Specs:      models.ServerSpecs{}, // Empty specs for now
 	}
 
@@ -181,6 +188,17 @@ func (h *ServerHandler) Create(c *fiber.Ctx) error {
 
 	// TODO: Enqueue provisioning job
 	// jobQueue.Enqueue(&ProvisionServerJob{ServerID: server.ID})
+
+	// Invalidate dashboard cache since server counts changed
+	if h.cacheInvalidation != nil {
+		if err := h.cacheInvalidation.InvalidateServerCache(ctx, tenantID, &server.ID); err != nil {
+			log.Error().
+				Err(err).
+				Str("server_id", server.ID.String()).
+				Msg("Failed to invalidate cache after server creation")
+			// Continue - don't fail the request due to cache issues
+		}
+	}
 
 	log.Info().
 		Str("server_id", server.ID.String()).
@@ -248,6 +266,17 @@ func (h *ServerHandler) Update(c *fiber.Ctx) error {
 		})
 	}
 
+	// Invalidate cache after server update
+	if h.cacheInvalidation != nil {
+		if err := h.cacheInvalidation.InvalidateServerCache(ctx, tenantID, &server.ID); err != nil {
+			log.Error().
+				Err(err).
+				Str("server_id", server.ID.String()).
+				Msg("Failed to invalidate cache after server update")
+			// Continue - don't fail the request due to cache issues
+		}
+	}
+
 	return c.JSON(serverToResponse(server, nil))
 }
 
@@ -290,6 +319,17 @@ func (h *ServerHandler) Delete(c *fiber.Ctx) error {
 			"error":   true,
 			"message": "Failed to delete server",
 		})
+	}
+
+	// Invalidate cache after server deletion
+	if h.cacheInvalidation != nil {
+		if err := h.cacheInvalidation.InvalidateServerCache(ctx, tenantID, &serverID); err != nil {
+			log.Error().
+				Err(err).
+				Str("server_id", serverID.String()).
+				Msg("Failed to invalidate cache after server deletion")
+			// Continue - don't fail the request due to cache issues
+		}
 	}
 
 	// TODO: Enqueue server destruction job
@@ -341,11 +381,11 @@ func (h *ServerHandler) GetMetrics(c *fiber.Ctx) error {
 	// TODO: Get actual metrics from TimescaleDB
 	// For now, return mock data with N/A fallback
 	return c.JSON(fiber.Map{
-		"cpu":    "N/A",
-		"memory": "N/A",
-		"disk":   "N/A",
-		"uptime": "N/A",
-		"status": "Unknown",
+		"cpu":     "N/A",
+		"memory":  "N/A",
+		"disk":    "N/A",
+		"uptime":  "N/A",
+		"status":  "Unknown",
 		"message": "Metrics collection not yet implemented",
 	})
 }
