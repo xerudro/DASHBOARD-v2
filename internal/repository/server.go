@@ -308,21 +308,25 @@ func (r *ServerRepository) CountByStatus(ctx context.Context, tenantID uuid.UUID
 	return count, nil
 }
 
-// GetWithMetrics retrieves servers with their latest metrics
+// GetWithMetrics retrieves servers with their latest metrics using optimized LATERAL JOIN
 func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUID, limit, offset int) ([]*models.ServerWithMetrics, error) {
 	query := `
 		SELECT s.id, s.tenant_id, s.provider_id, s.name, s.hostname, s.ip_address, s.provider_server_id,
 		       s.region, s.size, s.os, s.status, s.ssh_port, s.ssh_key, s.specs, s.tags,
 		       s.created_at, s.updated_at, s.provisioned_at, s.deleted_at,
 		       p.name as provider_name, p.type as provider_type,
-		       m.cpu_percent, m.load_average
+		       m.cpu_percent, m.memory_used_mb, m.memory_total_mb, m.disk_used_gb, m.disk_total_gb,
+		       m.load_average, m.network_in_mb, m.network_out_mb, m.connections, m.time as metrics_time
 		FROM servers s
 		LEFT JOIN providers p ON s.provider_id = p.id
-		LEFT JOIN (
-			SELECT DISTINCT ON (server_id) server_id, cpu_percent, load_average
-			FROM server_metrics
-			ORDER BY server_id, time DESC
-		) m ON s.id = m.server_id
+		LEFT JOIN LATERAL (
+			SELECT cpu_percent, memory_used_mb, memory_total_mb, disk_used_gb, disk_total_gb,
+			       load_average, network_in_mb, network_out_mb, connections, time
+			FROM server_metrics sm
+			WHERE sm.server_id = s.id
+			ORDER BY sm.time DESC
+			LIMIT 1
+		) m ON true
 		WHERE s.tenant_id = $1 AND (s.deleted_at IS NULL OR s.status != $2)
 		ORDER BY s.created_at DESC
 		LIMIT $3 OFFSET $4
@@ -339,7 +343,11 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 		server := &models.Server{}
 		metrics := &models.ServerMetrics{}
 
+		// Nullable metrics fields
 		var cpuPercent, loadAverage sql.NullFloat64
+		var memoryUsedMB, memoryTotalMB, diskUsedGB, diskTotalGB, networkInMB, networkOutMB sql.NullInt64
+		var connections sql.NullInt32
+		var metricsTime sql.NullTime
 		var providerName, providerType sql.NullString
 
 		err := rows.Scan(
@@ -347,24 +355,53 @@ func (r *ServerRepository) GetWithMetrics(ctx context.Context, tenantID uuid.UUI
 			&server.IPAddress, &server.ProviderServerID, &server.Region, &server.Size,
 			&server.OS, &server.Status, &server.SSHPort, &server.SSHKey, &server.Specs,
 			&server.Tags, &server.CreatedAt, &server.UpdatedAt, &server.ProvisionedAt,
-			&server.DeletedAt, &providerName, &providerType, &cpuPercent, &loadAverage,
+			&server.DeletedAt, &providerName, &providerType, &cpuPercent, &memoryUsedMB,
+			&memoryTotalMB, &diskUsedGB, &diskTotalGB, &loadAverage, &networkInMB,
+			&networkOutMB, &connections, &metricsTime,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan server with metrics: %w", err)
 		}
 
-		// Apply N/A fallback pattern
+		// Apply N/A fallback pattern for server
 		if server.IPAddress == nil || *server.IPAddress == "" {
 			na := "N/A"
 			server.IPAddress = &na
 		}
 
-		// Handle metrics with N/A fallback
-		if cpuPercent.Valid {
-			metrics.CPUPercent = &cpuPercent.Float64
-			metrics.LoadAverage = &loadAverage.Float64
+		// Handle metrics with N/A fallback - only create metrics if we have data
+		if metricsTime.Valid && (cpuPercent.Valid || memoryUsedMB.Valid || diskUsedGB.Valid) {
 			metrics.ServerID = server.ID
-			metrics.Time = time.Now()
+			metrics.Time = metricsTime.Time
+
+			if cpuPercent.Valid {
+				metrics.CPUPercent = &cpuPercent.Float64
+			}
+			if loadAverage.Valid {
+				metrics.LoadAverage = &loadAverage.Float64
+			}
+			if memoryUsedMB.Valid {
+				metrics.MemoryUsedMB = &memoryUsedMB.Int64
+			}
+			if memoryTotalMB.Valid {
+				metrics.MemoryTotalMB = &memoryTotalMB.Int64
+			}
+			if diskUsedGB.Valid {
+				metrics.DiskUsedGB = &diskUsedGB.Int64
+			}
+			if diskTotalGB.Valid {
+				metrics.DiskTotalGB = &diskTotalGB.Int64
+			}
+			if networkInMB.Valid {
+				metrics.NetworkInMB = &networkInMB.Int64
+			}
+			if networkOutMB.Valid {
+				metrics.NetworkOutMB = &networkOutMB.Int64
+			}
+			if connections.Valid {
+				connInt := int(connections.Int32)
+				metrics.Connections = &connInt
+			}
 		} else {
 			// No metrics available - use N/A pattern
 			metrics = nil
@@ -407,10 +444,4 @@ func (r *ServerRepository) GetByExternalID(ctx context.Context, tenantID uuid.UU
 	}
 
 	return server, nil
-}
-
-// models/server_with_metrics.go - Add this struct to models
-type ServerWithMetrics struct {
-	Server  *models.Server        `json:"server"`
-	Metrics *models.ServerMetrics `json:"metrics,omitempty"`
 }
