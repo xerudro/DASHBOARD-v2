@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"html/template"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,15 +17,24 @@ import (
 
 // AuthHandler handles authentication endpoints
 type AuthHandler struct {
-	userRepo *repository.UserRepository
-	jwt      *middleware.JWTMiddleware
+	userRepo  *repository.UserRepository
+	jwt       *middleware.JWTMiddleware
+	templates *template.Template
 }
 
 // NewAuthHandler creates a new auth handler
 func NewAuthHandler(userRepo *repository.UserRepository) *AuthHandler {
-	// JWT config will be injected from main
+	// Parse templates with auto-escaping
+	// html/template automatically escapes all variables to prevent XSS
+	templates := template.Must(template.New("").ParseFiles(
+		"web/templates/layouts/base.html",
+		"web/templates/pages/login.html",
+		"web/templates/pages/register.html",
+	))
+
 	return &AuthHandler{
-		userRepo: userRepo,
+		userRepo:  userRepo,
+		templates: templates,
 	}
 }
 
@@ -321,98 +331,93 @@ func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
 	})
 }
 
-// LoginPage renders login page (HTML)
+// LoginPage renders login page (HTML) using templates with auto-escaping
 func (h *AuthHandler) LoginPage(c *fiber.Ctx) error {
-	// This would render a Templ template
-	// For now, return a simple HTML response
-	return c.Type("html").SendString(`
-<!DOCTYPE html>
-<html>
-<head>
-    <title>VIP Hosting Panel - Login</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
-            <form method="POST" action="/login">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Email</label>
-                    <input type="email" name="email" required 
-                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2">Password</label>
-                    <input type="password" name="password" required 
-                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <button type="submit" 
-                        class="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 transition-colors">
-                    Login
-                </button>
-            </form>
-            <p class="text-center mt-4">
-                <a href="/register" class="text-blue-500 hover:underline">Register</a>
-            </p>
-        </div>
-    </div>
-</body>
-</html>
-	`)
+	// Parse query parameters for error/success messages
+	errorMsg := c.Query("error")
+	successMsg := c.Query("success")
+	email := c.Query("email", "")
+
+	// Map error codes to user-friendly messages
+	errorMessages := map[string]string{
+		"missing_fields":      "Please fill in all fields",
+		"invalid_credentials": "Invalid email or password",
+		"account_inactive":    "Your account is not active",
+		"login_failed":        "Login failed, please try again",
+	}
+
+	var errorText, successText string
+	if errorMsg != "" {
+		if msg, ok := errorMessages[errorMsg]; ok {
+			errorText = msg
+		} else {
+			errorText = "An error occurred"
+		}
+	}
+	if successMsg == "registration_complete" {
+		successText = "Registration successful! Please log in."
+	}
+
+	// Prepare template data
+	data := fiber.Map{
+		"Title":      "Login",
+		"Error":      errorText,
+		"Success":    successText,
+		"Email":      email,
+		"CSRFToken":  c.Locals("csrf_token"),
+		"CSP":        c.Get("Content-Security-Policy"),
+	}
+
+	// Render template with automatic HTML escaping
+	// html/template provides automatic context-aware escaping for:
+	// - HTML, JavaScript, CSS, and URLs
+	// - Prevents XSS attacks by escaping user input
+	c.Type("html")
+	return h.templates.ExecuteTemplate(c.Response().BodyWriter(), "login.html", data)
 }
 
-// RegisterPage renders registration page (HTML)
+// RegisterPage renders registration page (HTML) using templates with auto-escaping
 func (h *AuthHandler) RegisterPage(c *fiber.Ctx) error {
-	return c.Type("html").SendString(`
-<!DOCTYPE html>
-<html>
-<head>
-    <title>VIP Hosting Panel - Register</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold text-center mb-6">Register</h2>
-            <form method="POST" action="/register">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">First Name</label>
-                    <input type="text" name="first_name" required 
-                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Last Name</label>
-                    <input type="text" name="last_name" required 
-                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Email</label>
-                    <input type="email" name="email" required 
-                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2">Password</label>
-                    <input type="password" name="password" required 
-                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <button type="submit" 
-                        class="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 transition-colors">
-                    Register
-                </button>
-            </form>
-            <p class="text-center mt-4">
-                <a href="/login" class="text-blue-500 hover:underline">Login</a>
-            </p>
-        </div>
-    </div>
-</body>
-</html>
-	`)
+	// Parse query parameters for error messages
+	errorMsg := c.Query("error")
+	firstName := c.Query("first_name", "")
+	lastName := c.Query("last_name", "")
+	email := c.Query("email", "")
+
+	// Map error codes to user-friendly messages
+	errorMessages := map[string]string{
+		"missing_fields":       "Please fill in all required fields",
+		"user_exists":          "An account with this email already exists",
+		"registration_failed":  "Registration failed, please try again",
+		"weak_password":        "Password does not meet security requirements",
+	}
+
+	var errorText string
+	if errorMsg != "" {
+		if msg, ok := errorMessages[errorMsg]; ok {
+			errorText = msg
+		} else {
+			errorText = "An error occurred"
+		}
+	}
+
+	// Prepare template data
+	data := fiber.Map{
+		"Title":      "Register",
+		"Error":      errorText,
+		"FirstName":  firstName,
+		"LastName":   lastName,
+		"Email":      email,
+		"CSRFToken":  c.Locals("csrf_token"),
+		"CSP":        c.Get("Content-Security-Policy"),
+	}
+
+	// Render template with automatic HTML escaping
+	// html/template provides automatic context-aware escaping for:
+	// - HTML, JavaScript, CSS, and URLs
+	// - Prevents XSS attacks by escaping user input
+	c.Type("html")
+	return h.templates.ExecuteTemplate(c.Response().BodyWriter(), "register.html", data)
 }
 
 // LoginForm handles form-based login (HTML)
