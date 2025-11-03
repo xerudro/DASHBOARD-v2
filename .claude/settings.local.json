@@ -12,7 +12,8 @@
       "Bash(go mod tidy:*)",
       "Bash(go build:*)",
       "Bash(go doc:*)",
-      "Bash(go list:*)"
+      "Bash(go list:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

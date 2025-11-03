@@ -1,0 +1,84 @@
+# Multi-Database Configuration Example
+# Supports: PostgreSQL, MySQL, MariaDB
+
+database:
+  # Option 1: Use DSN (Direct Connection String)
+  # dsn: "postgresql://user:password@localhost:5432/dbname?sslmode=disable"
+  # dsn: "mysql://user:password@localhost:3306/dbname"
+
+  # Option 2: Use individual fields
+  type: "postgresql"  # Options: postgresql, mysql, mariadb
+  host: "localhost"
+  port: 5432         # PostgreSQL: 5432, MySQL/MariaDB: 3306
+  name: "vip_hosting"
+  user: "postgres"
+  password: "postgres"
+  ssl_mode: "disable"  # PostgreSQL only: disable, require, verify-full
+
+  # Connection pool settings (optimized for 100-200 concurrent users)
+  max_connections: 100
+  max_idle_connections: 30
+  max_lifetime: 1800        # 30 minutes (in seconds)
+  idle_timeout: 300         # 5 minutes (in seconds)
+
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+  pool_size: 100
+  min_idle_conns: 10
+
+---
+# Example configurations for different databases
+
+# PostgreSQL Configuration
+database_postgresql:
+  type: "postgresql"
+  host: "localhost"
+  port: 5432
+  name: "vip_hosting"
+  user: "postgres"
+  password: "your_password"
+  ssl_mode: "disable"
+  max_connections: 100
+  max_idle_connections: 30
+  max_lifetime: 1800
+  idle_timeout: 300
+
+# MySQL Configuration
+database_mysql:
+  type: "mysql"
+  host: "localhost"
+  port: 3306
+  name: "vip_hosting"
+  user: "root"
+  password: "your_password"
+  max_connections: 100
+  max_idle_connections: 30
+  max_lifetime: 1800
+  idle_timeout: 300
+
+# MariaDB Configuration
+database_mariadb:
+  type: "mariadb"
+  host: "localhost"
+  port: 3306
+  name: "vip_hosting"
+  user: "root"
+  password: "your_password"
+  max_connections: 100
+  max_idle_connections: 30
+  max_lifetime: 1800
+  idle_timeout: 300
+
+# Using DSN (Connection String) - Alternative approach
+database_dsn_examples:
+  # PostgreSQL DSN
+  postgresql_dsn: "postgresql://user:password@localhost:5432/vip_hosting?sslmode=disable"
+
+  # MySQL DSN
+  mysql_dsn: "mysql://user:password@localhost:3306/vip_hosting"
+
+  # MariaDB DSN (same as MySQL)
+  mariadb_dsn: "mysql://user:password@localhost:3306/vip_hosting"
