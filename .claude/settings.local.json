@@ -13,7 +13,10 @@
       "Bash(go build:*)",
       "Bash(go doc:*)",
       "Bash(go list:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(go vet:*)",
+      "Bash(go install:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

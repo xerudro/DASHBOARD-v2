@@ -1,0 +1,17 @@
+/* Tailwind CSS - Import via CDN or build process */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+.error-message {
+  @apply bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded;
+}
+
+.success-message {
+  @apply bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded;
+}

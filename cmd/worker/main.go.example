@@ -1,0 +1,77 @@
+// Background Worker Example
+// This worker handles asynchronous tasks like server provisioning, monitoring, etc.
+
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/hibiken/asynq"
+	"github.com/xerudro/DASHBOARD-v2/internal/database"
+)
+
+func main() {
+	// Load configuration
+	redisAddr := os.Getenv("REDIS_ADDR")
+	if redisAddr == "" {
+		redisAddr = "localhost:6379"
+	}
+
+	// Initialize database
+	db, err := database.NewDB(database.Config{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     5432,
+		Database: os.Getenv("DB_NAME"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+	})
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
+	// Create Redis connection options
+	redisOpt := asynq.RedisClientOpt{
+		Addr: redisAddr,
+	}
+
+	// Create worker server
+	srv := asynq.NewServer(
+		redisOpt,
+		asynq.Config{
+			Concurrency: 10,
+			Queues: map[string]int{
+				"critical": 6,
+				"default":  3,
+				"low":      1,
+			},
+		},
+	)
+
+	// Register task handlers
+	mux := asynq.NewServeMux()
+	// mux.HandleFunc("server:provision", handleServerProvision)
+	// mux.HandleFunc("server:monitor", handleServerMonitor)
+
+	// Start worker
+	go func() {
+		if err := srv.Run(mux); err != nil {
+			log.Fatalf("Worker failed: %v", err)
+		}
+	}()
+
+	log.Println("Worker started successfully")
+
+	// Wait for interrupt signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down worker...")
+	srv.Shutdown()
+}

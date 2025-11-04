@@ -1,0 +1,55 @@
+// This is an example integration of the vault into main.go
+// Copy the relevant sections to your actual cmd/api/main.go
+
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/xerudro/DASHBOARD-v2/internal/database"
+	"github.com/xerudro/DASHBOARD-v2/internal/handlers"
+	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
+	"github.com/xerudro/DASHBOARD-v2/internal/vault"
+)
+
+func main() {
+	// ... existing initialization code ...
+
+	// Initialize database
+	db, err := database.NewDB(dbConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Initialize vault (optional - only if you want to use the vault)
+	vaultConfig := vault.DefaultVaultConfig()
+	v, err := vault.NewVault(db.DB, vaultConfig)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize vault: %v", err)
+	} else {
+		// Try to unlock vault from environment variable
+		if err := v.UnlockFromEnv(); err != nil {
+			log.Printf("Vault is locked. Set VAULT_MASTER_KEY to unlock.")
+		} else {
+			log.Println("Vault unlocked successfully")
+		}
+	}
+
+	// ... existing middleware and handler setup ...
+
+	// Register vault routes (optional)
+	if v != nil {
+		vaultHandler := handlers.NewVaultHandler(v)
+		vaultHandler.RegisterRoutes(app, jwtMiddleware)
+	}
+
+	// ... rest of your main.go ...
+}

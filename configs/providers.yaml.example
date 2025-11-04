@@ -1,0 +1,37 @@
+# Cloud Provider Configurations Example
+# Copy this file to providers.yaml and add your provider credentials
+
+providers:
+  hetzner:
+    enabled: true
+    api_token_env: "HETZNER_API_TOKEN"
+    default_location: "nbg1"  # Nuremberg
+    default_server_type: "cx11"
+
+  digitalocean:
+    enabled: false
+    api_token_env: "DIGITALOCEAN_API_TOKEN"
+    default_region: "fra1"  # Frankfurt
+    default_size: "s-1vcpu-1gb"
+
+  vultr:
+    enabled: false
+    api_key_env: "VULTR_API_KEY"
+    default_region: "fra"
+    default_plan: "vc2-1c-1gb"
+
+# Email Provider Configuration
+email:
+  provider: "smtp"  # smtp, sendgrid, mailgun
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "your-email@example.com"
+    password_env: "SMTP_PASSWORD"
+    from_address: "noreply@yourdomain.com"
+    from_name: "VIP Hosting Panel"
+  sendgrid:
+    api_key_env: "SENDGRID_API_KEY"
+  mailgun:
+    api_key_env: "MAILGUN_API_KEY"
+    domain: "mg.yourdomain.com"
