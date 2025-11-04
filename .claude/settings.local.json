@@ -17,7 +17,14 @@
       "Bash(go vet:*)",
       "Bash(go install:*)",
       "Bash(test:*)",
-      "Bash(code --list-extensions)"
+      "Bash(code --list-extensions)",
+      "Bash(npm run build:css:*)",
+      "Bash(templ generate:*)",
+      "Bash(echo:*)",
+      "Bash(go env:*)",
+      "Bash(\"C:\\Users\\PCDoctorSM\\go\\bin\\templ.exe\" generate)",
+      "Bash(go run:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

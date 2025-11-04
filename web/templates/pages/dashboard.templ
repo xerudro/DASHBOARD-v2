@@ -1,9 +1,8 @@
 package pages
 
 import (
-	"github.com/vip-hosting/panel-v2/web/templates/layouts"
-	"github.com/vip-hosting/panel-v2/web/templates/components"
-	"github.com/vip-hosting/panel-v2/internal/models"
+	"github.com/xerudro/DASHBOARD-v2/web/templates/layouts"
+	"github.com/xerudro/DASHBOARD-v2/internal/models"
 	"fmt"
 )
 
@@ -39,80 +38,65 @@ templ Dashboard(user *models.User, data DashboardData) {
 		</div>
 		
 		<!-- Quick Actions -->
-		<div class="card mb-8">
-			<div class="card-header">
-				<h2 class="card-title">Quick Actions</h2>
-			</div>
-			
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-				@QuickActionButton("/clients/add", "plus", "Add Client", "Create a new client account")
-				@QuickActionButton("/vps/create", "server", "Create VPS", "Provision a new VPS instance")
-				@QuickActionButton("/domains/register", "globe", "Register Domain", "Register a new domain name")
-				@QuickActionButton("/email/settings", "mail", "Email Settings", "Configure email accounts")
+		<div class="mb-8">
+			<h2 class="text-xl font-semibold text-white mb-6">Quick Actions</h2>
+			<div class="flex flex-wrap gap-3">
+				@QuickActionButton("/clients/add", "plus", "Add Client", "")
+				@QuickActionButton("/vps/create", "server", "Create VPS", "")
+				@QuickActionButton("/domains/register", "globe", "Register Domain", "")
+				@QuickActionButton("/email/settings", "mail", "Email Settings", "")
 			</div>
 		</div>
 		
 		<!-- System Status -->
-		<div class="card">
-			<div class="card-header">
-				<h2 class="card-title">System Status</h2>
-			</div>
-			
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				@SystemStatusItem("VPS Services", data.SystemStatus.VPSServices, "All VPS services running normally")
-				@SystemStatusItem("Database", data.SystemStatus.Database, "Database connections healthy")
-				@SystemStatusItem("Security", data.SystemStatus.Security, "Security systems operational")
+		<div>
+			<h2 class="text-xl font-semibold text-white mb-6">System Status</h2>
+			<div class="flex flex-wrap gap-4">
+				@SystemStatusItem("VPS Services", data.SystemStatus.VPSServices, "")
+				@SystemStatusItem("Database", data.SystemStatus.Database, "")
+				@SystemStatusItem("Security", data.SystemStatus.Security, "")
 			</div>
 		</div>
 	}
 }
 
 templ StatCard(label string, value string, subtitle string, icon string, iconColor string) {
-	<div class="stat-card">
-		<div class="flex items-start justify-between">
+	<div class="bg-dark-800 border border-dark-700/50 rounded-xl p-6 hover:border-dark-600 transition-all">
+		<div class="flex items-center justify-between">
 			<div class="flex-1">
-				<p class="stat-label">{ label }</p>
-				<p class="stat-value mt-2">{ value }</p>
-				<p class="text-sm text-gray-500 mt-1">{ subtitle }</p>
+				<p class="text-sm font-medium text-gray-400 mb-3">{ label }</p>
+				<p class="text-4xl font-bold text-white mb-2">{ value }</p>
+				<p class="text-sm text-blue-400 font-medium">{ subtitle }</p>
 			</div>
-			<div class={ "p-3 rounded-lg bg-dark-700", iconColor }>
-				<i data-lucide={ icon } class="w-6 h-6"></i>
+			<div class="ml-4">
+				<i data-lucide={ icon } class={ "w-10 h-10", iconColor }></i>
 			</div>
 		</div>
 	</div>
 }
 
 templ QuickActionButton(href string, icon string, title string, description string) {
-	<a 
+	<a
 		href={ templ.SafeURL(href) }
-		class="flex items-start gap-4 p-4 rounded-lg border border-dark-700 hover:border-primary-500 hover:bg-dark-700/50 transition-all duration-200 group"
+		class="flex items-center gap-3 px-4 py-3 bg-dark-900 border border-dark-700/50 rounded-lg hover:border-dark-600 hover:bg-dark-800 transition-all duration-200 group"
 	>
-		<div class="p-2 rounded-lg bg-dark-700 group-hover:bg-primary-500 transition-colors">
-			<i data-lucide={ icon } class="w-5 h-5 text-gray-400 group-hover:text-white"></i>
-		</div>
-		<div class="flex-1">
-			<h3 class="text-sm font-medium text-white mb-1">{ title }</h3>
-			<p class="text-xs text-gray-500">{ description }</p>
-		</div>
+		<i data-lucide={ icon } class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"></i>
+		<span class="text-sm font-medium text-white">{ title }</span>
 	</a>
 }
 
 templ SystemStatusItem(label string, online bool, description string) {
-	<div class="flex items-center gap-4">
-		if online {
-			<div class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-500 rounded-lg">
-				<div class="status-online"></div>
-				<span class="text-sm font-medium">Online</span>
-			</div>
-		} else {
-			<div class="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-500 rounded-lg">
-				<div class="status-offline"></div>
-				<span class="text-sm font-medium">Offline</span>
-			</div>
-		}
-		<div class="flex-1">
-			<p class="text-sm font-medium text-white">{ label }</p>
-			<p class="text-xs text-gray-500">{ description }</p>
+	if online {
+		<div class="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg">
+			<i data-lucide="check-circle" class="w-4 h-4"></i>
+			<span class="text-sm font-medium">Online</span>
+			<span class="text-sm font-medium text-white ml-2">{ label }</span>
 		</div>
-	</div>
+	} else {
+		<div class="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg">
+			<i data-lucide="x-circle" class="w-4 h-4"></i>
+			<span class="text-sm font-medium">Offline</span>
+			<span class="text-sm font-medium text-white ml-2">{ label }</span>
+		</div>
+	}
 }

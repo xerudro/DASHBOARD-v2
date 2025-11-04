@@ -22,7 +22,7 @@ module.exports = {
           800: '#9a3412',
           900: '#7c2d12',
         },
-        // Dark theme colors
+        // Dark theme colors - matching reference design
         dark: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -31,10 +31,10 @@ module.exports = {
           400: '#94a3b8',
           500: '#64748b',
           600: '#475569',
-          700: '#334155',
-          800: '#1e293b', // Main dark background
-          900: '#0f172a', // Sidebar dark
-          950: '#020617', // Darkest
+          700: '#1e293b', // Card borders
+          800: '#0f1729', // Card background
+          900: '#0a0e27', // Main dark background - deeper navy
+          950: '#060920', // Darkest - sidebar
         },
         // Status colors
         success: '#10b981',
