@@ -444,12 +444,12 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 ### Frontend
 - [web/templates/](../web/templates/) - Templ HTML templates
 - [web/static/css/tailwind.css](../web/static/css/tailwind.css) - Tailwind source
-- [web/static/js/](../  web/static/js/) - Alpine.js and HTMX scripts
+- [web/static/js/](../web/static/js/) - Alpine.js and HTMX scripts
 
 ### Automation
 - [automation/playbooks/](../automation/playbooks/) - Ansible playbooks
-- [automation/scripts/](automation/scripts/) - Python orchestration scripts
-- [automation/templates/](automation/templates/) - Config file templates (Nginx, PHP, etc.)
+- [automation/scripts/](../automation/scripts/) - Python orchestration scripts
+- [automation/templates/](../automation/templates/) - Config file templates (Nginx, PHP, etc.)
 
 ### Database
 - [migrations/](../migrations/) - SQL migration files
