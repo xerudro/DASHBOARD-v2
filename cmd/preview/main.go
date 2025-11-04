@@ -108,14 +108,14 @@ func main() {
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status": "healthy",
-			"port":   5500,
+			"port":   5501,
 		})
 	})
 
-	// Start server on port 5500
-	log.Println("🚀 Preview server starting on http://localhost:5500")
-	log.Println("📱 Dashboard: http://localhost:5500")
-	if err := app.Listen(":5500"); err != nil {
+	// Start server on port 5501
+	log.Println("🚀 Preview server starting on http://localhost:5501")
+	log.Println("📱 Dashboard: http://localhost:5501")
+	if err := app.Listen(":5501"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }
