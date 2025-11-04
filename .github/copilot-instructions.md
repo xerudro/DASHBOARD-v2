@@ -430,8 +430,8 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 ## Critical Files & Paths
 
 ### Configuration
-- [configs/config.yaml.example](configs/config.yaml.example) - Main app config template
-- [configs/providers.yaml.example](configs/providers.yaml.example) - Provider API tokens
+- [configs/config.yaml.example](../configs/config.yaml.example) - Main app config template
+- [configs/providers.yaml.example](../configs/providers.yaml.example) - Provider API tokens
 - `.env` - Local environment overrides (not committed)
 
 ### Core Backend
@@ -456,9 +456,9 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 - [internal/models/](../internal/models/) - Database models
 
 ### Security
-- [.gitignore](.gitignore) - Never commit secrets, credentials, API keys
-- [SECURITY.md](SECURITY.md) - Vulnerability reporting policy
-- [.github/workflows/codeql.yml](.github/workflows/codeql.yml) - CodeQL security scanning
+- [.gitignore](../.gitignore) - Never commit secrets, credentials, API keys
+- [SECURITY.md](../SECURITY.md) - Vulnerability reporting policy
+- [.github/workflows/codeql.yml](../.github/workflows/codeql.yml) - CodeQL security scanning
 
 ## Common Tasks & Commands
 
@@ -596,8 +596,8 @@ git secrets --scan
 
 ## Resources & References
 
-- **PRD**: [project-prd.md](project-prd.md) - Product requirements and success metrics
-- **README**: [README.md](README.md) - Technical architecture and feature list
+- **PRD**: [../project-prd.md](../project-prd.md) - Product requirements and success metrics
+- **README**: [../README.md](../README.md) - Technical architecture and feature list
 - **HTMX Docs**: https://htmx.org/docs/
 - **Templ Guide**: https://templ.guide/
 - **Fiber Docs**: https://docs.gofiber.io/
