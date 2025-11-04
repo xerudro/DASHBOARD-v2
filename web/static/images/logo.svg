@@ -1,0 +1,18 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Background -->
+  <rect width="120" height="40" rx="8" class="fill-primary-600 dark:fill-primary-500"/>
+  
+  <!-- VIP Text -->
+  <text x="15" y="16" font-family="Inter, sans-serif" font-size="14" font-weight="700" class="fill-white">
+    VIP
+  </text>
+  
+  <!-- Hosting Text -->
+  <text x="15" y="32" font-family="Inter, sans-serif" font-size="10" font-weight="500" class="fill-white opacity-90">
+    HOSTING
+  </text>
+  
+  <!-- Icon -->
+  <circle cx="90" cy="20" r="12" class="fill-white opacity-20"/>
+  <path d="M85 20 L90 15 L95 20 L90 25 Z" class="fill-white"/>
+</svg>
