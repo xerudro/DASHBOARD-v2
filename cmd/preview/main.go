@@ -112,10 +112,10 @@ func main() {
 		})
 	})
 
-	// Start server on port 5501
-	log.Println("🚀 Preview server starting on http://localhost:5501")
-	log.Println("📱 Dashboard: http://localhost:5501")
-	if err := app.Listen(":5501"); err != nil {
+	// Start server on port 5502
+	log.Println("🚀 Preview server starting on http://localhost:5502")
+	log.Println("📱 Dashboard: http://localhost:5502")
+	if err := app.Listen(":5502"); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }

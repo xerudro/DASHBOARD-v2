@@ -75,683 +75,117 @@ func Servers(user *models.User, data ServersData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"{ activeTab: 'servers', activeRoleTab: 'overview' }\"><!-- Page Header --><div class=\"mb-8\"><!-- Tab Navigation --><div class=\"flex items-center justify-between mb-6\"><div class=\"flex gap-2\"><button @click=\"activeTab = 'servers'\" :class=\"activeTab === 'servers' ? 'bg-dark-800 text-white border-primary-500' : 'bg-dark-900 text-gray-400 border-dark-700/50 hover:text-white hover:border-dark-600'\" class=\"px-4 py-2 rounded-lg border transition-all text-sm font-medium\">Servers</button> <button @click=\"activeTab = 'ssh'\" :class=\"activeTab === 'ssh' ? 'bg-dark-800 text-white border-primary-500' : 'bg-dark-900 text-gray-400 border-dark-700/50 hover:text-white hover:border-dark-600'\" class=\"px-4 py-2 rounded-lg border transition-all text-sm font-medium\">SSH Terminal</button> <button @click=\"activeTab = 'roles'\" :class=\"activeTab === 'roles' ? 'bg-dark-800 text-white border-primary-500' : 'bg-dark-900 text-gray-400 border-dark-700/50 hover:text-white hover:border-dark-600'\" class=\"px-4 py-2 rounded-lg border transition-all text-sm font-medium\">Server Roles</button></div></div><!-- Tab Content --><!-- Physical Servers Tab --><div x-show=\"activeTab === 'servers'\" x-cloak><div class=\"mb-6\"><h1 class=\"text-3xl font-bold text-white mb-2\">Physical Server Management</h1><p class=\"text-gray-400\">Manage and monitor your physical and dedicated servers</p><p class=\"text-sm text-blue-400 mt-2\">For VPS instances, please visit the <a href=\"/vps\" class=\"underline hover:text-blue-300\">VPS Management</a> page</p></div><!-- Stats Cards --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div x-data=\"{ activeTab: 'servers' }\"><!-- Tab Navigation --><div class=\"flex gap-1 mb-8 border-b border-gray-200 dark:border-dark-700/50\"><button @click=\"activeTab = 'servers'\" :class=\"activeTab === 'servers' ? 'border-b-2 border-primary-500 text-gray-900 dark:text-white bg-gray-50 dark:bg-dark-800/50' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-800/30'\" class=\"px-6 py-3 text-sm font-medium rounded-t-lg transition-all -mb-px\">Servers</button> <button @click=\"activeTab = 'ssh'\" :class=\"activeTab === 'ssh' ? 'border-b-2 border-primary-500 text-gray-900 dark:text-white bg-gray-50 dark:bg-dark-800/50' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-800/30'\" class=\"px-6 py-3 text-sm font-medium rounded-t-lg transition-all -mb-px\">SSH Terminal</button> <button @click=\"activeTab = 'roles'\" :class=\"activeTab === 'roles' ? 'border-b-2 border-primary-500 text-gray-900 dark:text-white bg-gray-50 dark:bg-dark-800/50' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-800/30'\" class=\"px-6 py-3 text-sm font-medium rounded-t-lg transition-all -mb-px\">Server Roles</button></div><!-- Servers Tab --><div x-show=\"activeTab === 'servers'\" x-cloak><div class=\"mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between\"><div><h1 class=\"text-3xl font-bold text-gray-900 dark:text-white mb-2\">Physical Server Management</h1><p class=\"text-gray-600 dark:text-gray-400\">Manage and monitor your physical and dedicated servers</p><p class=\"text-sm text-blue-600 dark:text-blue-400 mt-2\">For VPS instances, please visit the <a href=\"/vps\" class=\"underline hover:text-blue-500 dark:hover:text-blue-300\">VPS Management</a> page</p></div><div class=\"mt-4 sm:mt-0 sm:ml-4\"><button class=\"inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-sm transition-colors\"><i data-lucide=\"plus\" class=\"w-5 h-5 mr-2\"></i> Add Physical Server</button></div></div><!-- Stats Cards --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8\"><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-3\"><p class=\"text-sm font-medium text-gray-600 dark:text-gray-400\">Total Servers</p></div><p class=\"text-3xl font-bold mb-2 text-gray-900 dark:text-white\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = ServerStatCard("Total Servers", fmt.Sprintf("%d", data.TotalServers), "All physical servers").Render(ctx, templ_7745c5c3_Buffer)
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.TotalServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 89, Col: 109}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = ServerStatCard("Online", fmt.Sprintf("%d", data.OnlineServers), "Currently active", "text-green-500").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p><p class=\"text-sm text-gray-500 dark:text-gray-500\">All physical servers</p></div><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-3\"><p class=\"text-sm font-medium text-gray-600 dark:text-gray-400\">Online</p></div><p class=\"text-3xl font-bold mb-2 text-green-500\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = ServerStatCard("Offline", fmt.Sprintf("%d", data.OfflineServers), "Not responding", "text-red-500").Render(ctx, templ_7745c5c3_Buffer)
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.OnlineServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 96, Col: 95}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = ServerStatCard("Maintenance", fmt.Sprintf("%d", data.MaintenanceServers), "Under maintenance", "text-yellow-500").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p><p class=\"text-sm text-gray-500 dark:text-gray-500\">Currently active</p></div><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-3\"><p class=\"text-sm font-medium text-gray-600 dark:text-gray-400\">Offline</p></div><p class=\"text-3xl font-bold mb-2 text-red-500\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><!-- Search and Filters --><div class=\"grid grid-cols-1 md:grid-cols-12 gap-4 mb-6\"><div class=\"md:col-span-6 relative\"><i data-lucide=\"search\" class=\"w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500\"></i> <input type=\"text\" placeholder=\"Search servers by name, IP, or location...\" class=\"w-full pl-10 pr-4 py-2.5 bg-dark-900 border border-dark-700/50 rounded-lg text-white placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors\"></div><div class=\"md:col-span-3\"><select class=\"w-full px-4 py-2.5 bg-dark-900 border border-dark-700/50 rounded-lg text-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors cursor-pointer\"><option>All Status</option> <option>Online</option> <option>Offline</option> <option>Maintenance</option></select></div><div class=\"md:col-span-3\"><select class=\"w-full px-4 py-2.5 bg-dark-900 border border-dark-700/50 rounded-lg text-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors cursor-pointer\"><option>All Types</option> <option>Physical</option> <option>Dedicated</option></select></div></div><!-- Servers Table / Empty State -->")
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.OfflineServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 103, Col: 94}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(data.Servers) == 0 {
-				templ_7745c5c3_Err = EmptyServerState().Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			} else {
-				templ_7745c5c3_Err = ServersTable(data.Servers).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><!-- SSH Terminal Tab --><div x-show=\"activeTab === 'ssh'\" x-cloak><div class=\"mb-6\"><h1 class=\"text-3xl font-bold text-white mb-2\">SSH Terminal Access</h1><p class=\"text-gray-400\">Connect to your physical servers via SSH terminal</p></div><div class=\"bg-dark-800 border border-dark-700/50 rounded-xl p-12 text-center\"><p class=\"text-gray-400\">No servers available for SSH access</p></div></div><!-- Server Roles Tab --><div x-show=\"activeTab === 'roles'\" x-cloak><div class=\"mb-6\"><h1 class=\"text-3xl font-bold text-white mb-2\">Server Roles Management</h1><p class=\"text-gray-400\">Configure which servers handle specific roles like database, mail, web hosting, and backup operations.</p></div><div class=\"mb-6\"><h2 class=\"text-2xl font-semibold text-white mb-4\">Server Roles Management</h2><div class=\"flex items-center justify-between\"><p class=\"text-gray-400\">Configure and monitor server roles across your infrastructure</p><button class=\"flex items-center gap-2 px-4 py-2 bg-dark-800 border border-dark-700/50 rounded-lg text-white hover:border-dark-600 transition-all\"><i data-lucide=\"refresh-cw\" class=\"w-4 h-4\"></i> <span class=\"text-sm font-medium\">Refresh Status</span></button></div></div><!-- Role Sub-tabs --><div class=\"flex gap-2 mb-8\"><button @click=\"activeRoleTab = 'overview'\" :class=\"activeRoleTab === 'overview' ? 'bg-dark-800 text-white border-primary-500' : 'bg-dark-900 text-gray-400 border-dark-700/50 hover:text-white hover:border-dark-600'\" class=\"px-4 py-2 rounded-lg border transition-all text-sm font-medium\"><i data-lucide=\"bar-chart-2\" class=\"w-4 h-4 inline mr-2\"></i> Overview</button> <button @click=\"activeRoleTab = 'migration'\" :class=\"activeRoleTab === 'migration' ? 'bg-dark-800 text-white border-primary-500' : 'bg-dark-900 text-gray-400 border-dark-700/50 hover:text-white hover:border-dark-600'\" class=\"px-4 py-2 rounded-lg border transition-all text-sm font-medium\"><i data-lucide=\"refresh-cw\" class=\"w-4 h-4 inline mr-2\"></i> Migration</button> <button @click=\"activeRoleTab = 'configuration'\" :class=\"activeRoleTab === 'configuration' ? 'bg-dark-800 text-white border-primary-500' : 'bg-dark-900 text-gray-400 border-dark-700/50 hover:text-white hover:border-dark-600'\" class=\"px-4 py-2 rounded-lg border transition-all text-sm font-medium\"><i data-lucide=\"settings\" class=\"w-4 h-4 inline mr-2\"></i> Configuration</button></div><!-- Overview Tab --><div x-show=\"activeRoleTab === 'overview'\" x-cloak>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p><p class=\"text-sm text-gray-500 dark:text-gray-500\">Not responding</p></div><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-3\"><p class=\"text-sm font-medium text-gray-600 dark:text-gray-400\">Maintenance</p></div><p class=\"text-3xl font-bold mb-2 text-yellow-500\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = ServerRolesOverview(data.ServerRoles).Render(ctx, templ_7745c5c3_Buffer)
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.MaintenanceServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 110, Col: 101}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><!-- Migration Tab --><div x-show=\"activeRoleTab === 'migration'\" x-cloak>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p><p class=\"text-sm text-gray-500 dark:text-gray-500\">Under maintenance</p></div></div><!-- Search and Filters --><div class=\"grid grid-cols-1 md:grid-cols-12 gap-4 mb-6\"><div class=\"md:col-span-6 relative\"><i data-lucide=\"search\" class=\"w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500\"></i> <input type=\"text\" placeholder=\"Search servers by name, IP, or location...\" class=\"w-full pl-10 pr-4 py-2.5 bg-white dark:bg-dark-900 border border-gray-300 dark:border-dark-700/50 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors\"></div><div class=\"md:col-span-3\"><select class=\"w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-gray-300 dark:border-dark-700/50 rounded-lg text-gray-700 dark:text-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors cursor-pointer\"><option>All Status</option> <option>Online</option> <option>Offline</option> <option>Maintenance</option></select></div><div class=\"md:col-span-3\"><select class=\"w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-gray-300 dark:border-dark-700/50 rounded-lg text-gray-700 dark:text-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors cursor-pointer\"><option>All Types</option> <option>Physical</option> <option>Dedicated</option></select></div></div><!-- Empty State --><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-20 text-center\"><svg class=\"w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-8\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"></rect> <rect x=\"2\" y=\"14\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"></rect> <line x1=\"6\" y1=\"6\" x2=\"6.01\" y2=\"6\"></line> <line x1=\"6\" y1=\"18\" x2=\"6.01\" y2=\"18\"></line></svg><h3 class=\"text-xl font-semibold text-gray-900 dark:text-white mb-3\">No servers found</h3><p class=\"text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto\">Get started by adding your first physical server to the panel.</p><button class=\"inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-lg shadow-red-600/20\"><i data-lucide=\"plus\" class=\"w-5 h-5\"></i> <span>Add Server</span></button></div></div><!-- SSH Terminal Tab --><div x-show=\"activeTab === 'ssh'\" x-cloak><div class=\"mb-6\"><h1 class=\"text-3xl font-bold text-gray-900 dark:text-white mb-2\">SSH Terminal Access</h1><p class=\"text-gray-600 dark:text-gray-400\">Connect to your physical servers via SSH terminal</p></div><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-12 text-center\"><p class=\"text-gray-600 dark:text-gray-400\">No servers available for SSH access</p></div></div><!-- Server Roles Tab --><div x-show=\"activeTab === 'roles'\" x-cloak x-data=\"{ roleTab: 'overview' }\"><div class=\"flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6\"><div><h1 class=\"text-3xl font-bold text-gray-900 dark:text-white mb-2\">Server Roles Management</h1><p class=\"text-gray-600 dark:text-gray-400\">Configure and monitor server roles across your infrastructure</p></div><div class=\"mt-4 sm:mt-0 sm:ml-4\"><button class=\"inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-dark-700 dark:hover:bg-dark-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors\"><i data-lucide=\"refresh-cw\" class=\"w-4 h-4 mr-2\"></i> Refresh Status</button></div></div><!-- Role Sub-navigation --><div class=\"flex gap-1 mb-8 border-b border-gray-200 dark:border-dark-700/50\"><button @click=\"roleTab = 'overview'\" :class=\"roleTab === 'overview' ? 'border-b-2 border-primary-500 text-gray-900 dark:text-white bg-gray-50 dark:bg-dark-800/50' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-800/30'\" class=\"px-4 py-2 text-sm font-medium rounded-t-lg transition-all -mb-px\"><i data-lucide=\"bar-chart-2\" class=\"w-4 h-4 mr-2 inline\"></i> Overview</button> <button @click=\"roleTab = 'migration'\" :class=\"roleTab === 'migration' ? 'border-b-2 border-primary-500 text-gray-900 dark:text-white bg-gray-50 dark:bg-dark-800/50' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-800/30'\" class=\"px-4 py-2 text-sm font-medium rounded-t-lg transition-all -mb-px\"><i data-lucide=\"move\" class=\"w-4 h-4 mr-2 inline\"></i> Migration</button> <button @click=\"roleTab = 'configuration'\" :class=\"roleTab === 'configuration' ? 'border-b-2 border-primary-500 text-gray-900 dark:text-white bg-gray-50 dark:bg-dark-800/50' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-800/30'\" class=\"px-4 py-2 text-sm font-medium rounded-t-lg transition-all -mb-px\"><i data-lucide=\"settings\" class=\"w-4 h-4 mr-2 inline\"></i> Configuration</button></div><!-- Overview Tab --><div x-show=\"roleTab === 'overview'\" x-cloak><!-- Role Cards Grid --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8\"><!-- Web Server Card --><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-4\"><div class=\"flex items-center gap-3\"><div class=\"w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center\"><i data-lucide=\"globe\" class=\"w-5 h-5 text-blue-600 dark:text-blue-400\"></i></div><div><h3 class=\"font-semibold text-gray-900 dark:text-white\">Web Server</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Hosts websites and web applications</p></div></div><span class=\"text-2xl font-bold text-gray-900 dark:text-white\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = RoleMigrationManager().Render(ctx, templ_7745c5c3_Buffer)
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.ServerRoles.WebServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 231, Col: 119}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><!-- Configuration Tab --><div x-show=\"activeRoleTab === 'configuration'\" x-cloak>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></div><div class=\"flex items-center text-sm text-gray-500 dark:text-gray-400\"><i data-lucide=\"trending-up\" class=\"w-4 h-4 mr-1\"></i> <span>No servers assigned</span></div></div><!-- Database Card --><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-4\"><div class=\"flex items-center gap-3\"><div class=\"w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center\"><i data-lucide=\"database\" class=\"w-5 h-5 text-purple-600 dark:text-purple-400\"></i></div><div><h3 class=\"font-semibold text-gray-900 dark:text-white\">Database</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Manages database operations</p></div></div><span class=\"text-2xl font-bold text-gray-900 dark:text-white\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = RoleConfiguration().Render(ctx, templ_7745c5c3_Buffer)
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.ServerRoles.Databases))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 251, Col: 118}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span></div><div class=\"flex items-center text-sm text-gray-500 dark:text-gray-400\"><i data-lucide=\"trending-up\" class=\"w-4 h-4 mr-1\"></i> <span>No servers assigned</span></div></div><!-- Mail Server Card --><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-4\"><div class=\"flex items-center gap-3\"><div class=\"w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center\"><i data-lucide=\"mail\" class=\"w-5 h-5 text-green-600 dark:text-green-400\"></i></div><div><h3 class=\"font-semibold text-gray-900 dark:text-white\">Mail Server</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Handles email services</p></div></div><span class=\"text-2xl font-bold text-gray-900 dark:text-white\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.ServerRoles.MailServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 271, Col: 120}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span></div><div class=\"flex items-center text-sm text-gray-500 dark:text-gray-400\"><i data-lucide=\"trending-up\" class=\"w-4 h-4 mr-1\"></i> <span>No servers assigned</span></div></div><!-- Backup Server Card --><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6 hover:shadow-lg dark:hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-4\"><div class=\"flex items-center gap-3\"><div class=\"w-10 h-10 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center\"><i data-lucide=\"hard-drive\" class=\"w-5 h-5 text-orange-600 dark:text-orange-400\"></i></div><div><h3 class=\"font-semibold text-gray-900 dark:text-white\">Backup Server</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Manages backup operations</p></div></div><span class=\"text-2xl font-bold text-gray-900 dark:text-white\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.ServerRoles.BackupServers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 291, Col: 122}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></div><div class=\"flex items-center text-sm text-gray-500 dark:text-gray-400\"><i data-lucide=\"trending-up\" class=\"w-4 h-4 mr-1\"></i> <span>No servers assigned</span></div></div></div><!-- Role Distribution Summary --><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-6\"><h2 class=\"text-xl font-semibold text-gray-900 dark:text-white mb-6\">Role Distribution Summary</h2><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6\"><!-- Web Server Summary --><div class=\"flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900/50 rounded-lg\"><div class=\"w-3 h-3 bg-blue-500 rounded-full\"></div><div class=\"flex-1\"><h3 class=\"font-medium text-gray-900 dark:text-white\">Web Server</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Hosts websites and web applications</p><p class=\"text-sm text-gray-500 dark:text-gray-500 mt-1\">0/0 online</p></div></div><!-- Database Summary --><div class=\"flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900/50 rounded-lg\"><div class=\"w-3 h-3 bg-purple-500 rounded-full\"></div><div class=\"flex-1\"><h3 class=\"font-medium text-gray-900 dark:text-white\">Database</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Manages database operations</p><p class=\"text-sm text-gray-500 dark:text-gray-500 mt-1\">0/0 online</p></div></div><!-- Mail Server Summary --><div class=\"flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900/50 rounded-lg\"><div class=\"w-3 h-3 bg-green-500 rounded-full\"></div><div class=\"flex-1\"><h3 class=\"font-medium text-gray-900 dark:text-white\">Mail Server</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Handles email services</p><p class=\"text-sm text-gray-500 dark:text-gray-500 mt-1\">0/0 online</p></div></div><!-- Backup Server Summary --><div class=\"flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900/50 rounded-lg\"><div class=\"w-3 h-3 bg-orange-500 rounded-full\"></div><div class=\"flex-1\"><h3 class=\"font-medium text-gray-900 dark:text-white\">Backup Server</h3><p class=\"text-sm text-gray-600 dark:text-gray-400\">Manages backup operations</p><p class=\"text-sm text-gray-500 dark:text-gray-500 mt-1\">0/0 online</p></div></div></div></div></div><!-- Migration Tab --><div x-show=\"roleTab === 'migration'\" x-cloak><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-8 text-center\"><i data-lucide=\"move\" class=\"w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4\"></i><h3 class=\"text-xl font-semibold text-gray-900 dark:text-white mb-3\">Server Role Migration</h3><p class=\"text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto\">Migrate server roles between different servers to optimize your infrastructure.</p><button class=\"inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors font-medium\"><i data-lucide=\"plus\" class=\"w-5 h-5\"></i> <span>Start Migration</span></button></div></div><!-- Configuration Tab --><div x-show=\"roleTab === 'configuration'\" x-cloak><div class=\"bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700/50 rounded-xl p-8 text-center\"><i data-lucide=\"settings\" class=\"w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4\"></i><h3 class=\"text-xl font-semibold text-gray-900 dark:text-white mb-3\">Role Configuration</h3><p class=\"text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto\">Configure role-specific settings and policies for your server infrastructure.</p><button class=\"inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors font-medium\"><i data-lucide=\"settings\" class=\"w-5 h-5\"></i> <span>Configure Roles</span></button></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
 		templ_7745c5c3_Err = layouts.Base(user, "Physical Server Management").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func ServerStatCard(label string, value string, subtitle string, colorClass ...string) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"bg-dark-800 border border-dark-700/50 rounded-xl p-6 hover:border-dark-600 transition-all\"><p class=\"text-sm font-medium text-gray-400 mb-2\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(label)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 203, Col: 59}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if len(colorClass) > 0 {
-			var templ_7745c5c3_Var5 = []any{"text-4xl font-bold mb-1", colorClass[0]}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var5).String())
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 1, Col: 0}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(value)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 205, Col: 64}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<p class=\"text-4xl font-bold mb-1 text-white\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(value)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 207, Col: 56}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<p class=\"text-sm text-gray-500\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(subtitle)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 209, Col: 45}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</p></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func EmptyServerState() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"bg-dark-800 border border-dark-700/50 rounded-xl p-20 text-center\"><div class=\"flex flex-col items-center justify-center\"><!-- Server Icon Stack --><div class=\"mb-8 relative\"><svg class=\"w-16 h-16 text-gray-600\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"></rect> <rect x=\"2\" y=\"14\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"></rect> <line x1=\"6\" y1=\"6\" x2=\"6.01\" y2=\"6\"></line> <line x1=\"6\" y1=\"18\" x2=\"6.01\" y2=\"18\"></line></svg></div><h3 class=\"text-xl font-semibold text-white mb-3\">No servers found</h3><p class=\"text-gray-400 mb-8 max-w-md text-base\">Get started by adding your first physical server to the panel.</p><button class=\"inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-lg shadow-primary-500/20\"><i data-lucide=\"plus\" class=\"w-5 h-5\"></i> <span>Add Server</span></button></div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func ServersTable(servers []ServerItem) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"bg-dark-800 border border-dark-700/50 rounded-xl overflow-hidden\"><div class=\"overflow-x-auto\"><table class=\"w-full\"><thead class=\"bg-dark-700/50 border-b border-dark-700/50\"><tr><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider\">Server Name</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider\">IP Address</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider\">Location</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider\">Status</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider\">Resources</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider\">Uptime</th><th class=\"px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider\">Actions</th></tr></thead> <tbody class=\"divide-y divide-dark-700/50\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		for _, server := range servers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<tr class=\"hover:bg-dark-700/30 transition-colors\"><td class=\"px-6 py-4 whitespace-nowrap\"><div class=\"text-sm font-medium text-white\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(server.Name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 258, Col: 65}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div><div class=\"text-xs text-gray-500\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(server.Type)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 259, Col: 56}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-300\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(server.IPAddress)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 261, Col: 87}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-300\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(server.Location)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 262, Col: 86}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</td><td class=\"px-6 py-4 whitespace-nowrap\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = ServerStatusBadge(server.Status).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-300\"><div>CPU: ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var16 string
-			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(server.CPU)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 267, Col: 30}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div><div>RAM: ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(server.RAM)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 268, Col: 30}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-300\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var18 string
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(server.Uptime)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 270, Col: 84}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</td><td class=\"px-6 py-4 whitespace-nowrap text-right text-sm\"><button class=\"text-gray-400 hover:text-white transition-colors p-2\"><i data-lucide=\"more-vertical\" class=\"w-5 h-5\"></i></button></td></tr>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</tbody></table></div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func ServerStatusBadge(status string) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		if status == "online" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<span class=\"inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-xs font-medium\"><span class=\"w-1.5 h-1.5 bg-green-500 rounded-full\"></span> Online</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else if status == "offline" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<span class=\"inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full text-xs font-medium\"><span class=\"w-1.5 h-1.5 bg-red-500 rounded-full\"></span> Offline</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<span class=\"inline-flex items-center gap-1.5 px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-full text-xs font-medium\"><span class=\"w-1.5 h-1.5 bg-yellow-500 rounded-full\"></span> Maintenance</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		return nil
-	})
-}
-
-func ServerRolesOverview(roles ServerRolesData) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleCard("Web Server", "globe", "Hosts websites and web applications", roles.WebServers).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleCard("Database", "database", "Manages database operations", roles.Databases).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleCard("Mail Server", "mail", "Handles email services", roles.MailServers).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleCard("Backup Server", "hard-drive", "Manages backup operations", roles.BackupServers).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div><!-- Role Distribution Summary --><div class=\"bg-dark-800 border border-dark-700/50 rounded-xl p-6\"><h3 class=\"text-lg font-semibold text-white mb-6\">Role Distribution Summary</h3><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleSummaryItem("Web Server", "0/0 online", "Hosts websites and web applications", "globe").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleSummaryItem("Database", "0/0 online", "Manages database operations", "database").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleSummaryItem("Mail Server", "0/0 online", "Handles email services", "mail").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = RoleSummaryItem("Backup Server", "0/0 online", "Manages backup operations", "hard-drive").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func RoleCard(title string, icon string, description string, count int) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"bg-dark-900 border border-dark-700/50 rounded-xl p-6 hover:border-dark-600 transition-all\"><div class=\"flex items-center justify-between mb-4\"><div class=\"p-3 bg-dark-800 rounded-lg\"><i data-lucide=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(icon)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 327, Col: 25}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"w-6 h-6 text-primary-500\"></i></div><span class=\"text-3xl font-bold text-white\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", count))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 329, Col: 73}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</span></div><h3 class=\"text-lg font-semibold text-white mb-2\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 331, Col: 59}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</h3><p class=\"text-sm text-gray-400 mb-3\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 332, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</p><div class=\"flex items-center text-sm text-gray-500\"><i data-lucide=\"trending-up\" class=\"w-4 h-4 mr-1\"></i> No servers assigned</div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func RoleSummaryItem(title string, status string, description string, icon string) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var26 == nil {
-			templ_7745c5c3_Var26 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"flex items-start gap-4\"><div class=\"p-2 bg-dark-900 rounded-lg\"><i data-lucide=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(icon)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 343, Col: 24}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" class=\"w-5 h-5 text-primary-500\"></i></div><div class=\"flex-1\"><h4 class=\"text-sm font-semibold text-white mb-1\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 346, Col: 60}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</h4><p class=\"text-xs text-gray-500 mb-1\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var29 string
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 347, Col: 54}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</p><p class=\"text-xs text-gray-400\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var30 string
-		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(status)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/servers.templ`, Line: 348, Col: 44}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</p></div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func RoleMigrationManager() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var31 == nil {
-			templ_7745c5c3_Var31 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"bg-dark-800 border border-dark-700/50 rounded-xl p-8\"><div class=\"flex items-center gap-2 mb-6\"><i data-lucide=\"arrow-right\" class=\"w-5 h-5 text-primary-500\"></i><h3 class=\"text-xl font-semibold text-white\">Role Migration Manager</h3></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 mb-6\"><div><label class=\"block text-sm font-medium text-gray-400 mb-2\">Select Role</label> <select class=\"w-full px-4 py-2.5 bg-dark-900 border border-dark-700/50 rounded-lg text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors\"><option>Choose role to migrate</option> <option>Web Server</option> <option>Database</option> <option>Mail Server</option> <option>Backup Server</option></select></div><div><label class=\"block text-sm font-medium text-gray-400 mb-2\">Source Server</label> <select class=\"w-full px-4 py-2.5 bg-dark-900 border border-dark-700/50 rounded-lg text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors\"><option>Select source server</option></select></div><div><label class=\"block text-sm font-medium text-gray-400 mb-2\">Target Server</label> <select class=\"w-full px-4 py-2.5 bg-dark-900 border border-dark-700/50 rounded-lg text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors\"><option>Select target server</option></select></div></div><button class=\"w-full px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium\">Start Migration</button></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func RoleConfiguration() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var32 == nil {
-			templ_7745c5c3_Var32 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"bg-dark-800 border border-dark-700/50 rounded-xl p-8\"><h3 class=\"text-xl font-semibold text-white mb-4\">Server Role Configuration</h3><p class=\"text-gray-400 text-center py-12\">Configuration options will be displayed here</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
