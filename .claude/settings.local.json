@@ -24,7 +24,10 @@
       "Bash(go env:*)",
       "Bash(\"C:\\Users\\PCDoctorSM\\go\\bin\\templ.exe\" generate)",
       "Bash(go run:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
