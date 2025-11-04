@@ -435,25 +435,25 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 - `.env` - Local environment overrides (not committed)
 
 ### Core Backend
-- [cmd/api/main.go](cmd/api/main.go) - API server entrypoint
-- [cmd/worker/main.go](cmd/worker/main.go) - Background job processor
-- [internal/handlers/](internal/handlers/) - HTTP request handlers
-- [internal/services/](internal/services/) - Business logic layer
-- [internal/jobs/](internal/jobs/) - Background job definitions
+- [cmd/api/main.go](../cmd/api/main.go) - API server entrypoint
+- [cmd/worker/main.go](../cmd/worker/main.go) - Background job processor
+- [internal/handlers/](../internal/handlers/) - HTTP request handlers
+- [internal/services/](../internal/services/) - Business logic layer
+- [internal/jobs/](../internal/jobs/) - Background job definitions
 
 ### Frontend
-- [web/templates/](web/templates/) - Templ HTML templates
-- [web/static/css/tailwind.css](web/static/css/tailwind.css) - Tailwind source
-- [web/static/js/](web/static/js/) - Alpine.js and HTMX scripts
+- [web/templates/](../web/templates/) - Templ HTML templates
+- [web/static/css/tailwind.css](../web/static/css/tailwind.css) - Tailwind source
+- [web/static/js/](../  web/static/js/) - Alpine.js and HTMX scripts
 
 ### Automation
-- [automation/playbooks/](automation/playbooks/) - Ansible playbooks
+- [automation/playbooks/](../automation/playbooks/) - Ansible playbooks
 - [automation/scripts/](automation/scripts/) - Python orchestration scripts
 - [automation/templates/](automation/templates/) - Config file templates (Nginx, PHP, etc.)
 
 ### Database
-- [migrations/](migrations/) - SQL migration files
-- [internal/models/](internal/models/) - Database models
+- [migrations/](../migrations/) - SQL migration files
+- [internal/models/](../internal/models/) - Database models
 
 ### Security
 - [.gitignore](.gitignore) - Never commit secrets, credentials, API keys
