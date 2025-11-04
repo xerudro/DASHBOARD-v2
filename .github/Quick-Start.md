@@ -79,7 +79,7 @@ sudo systemctl restart vip-panel-worker
 ## 🎨 Design Features
 
 ✅ **Dark Theme by Default** (navy blue background)
-✅ **Orange Accent Color** (#FF6B35)
+✅ **Orange Accent Color** (hex FF6B35)
 ✅ **Light Mode Toggle** (top right)
 ✅ **Sidebar Navigation** (16 menu items)
 ✅ **Real-time Updates** (via HTMX + SSE)

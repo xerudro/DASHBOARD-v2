@@ -16,7 +16,8 @@
       "Bash(chmod:*)",
       "Bash(go vet:*)",
       "Bash(go install:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(code --list-extensions)"
     ],
     "deny": [],
     "ask": []

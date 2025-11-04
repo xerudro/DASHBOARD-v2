@@ -384,7 +384,7 @@ func (h *ServerHandler) GetServerCard(c *fiber.Ctx) error {
 - **Tooltips**: Show last updated timestamp on hover
 
 ### Design System
-- **Color Palette**: Primary orange (#FF6B35), Dark theme (navy/slate), Status colors (green/yellow/red/blue)
+- **Color Palette**: Primary orange with hex color FF6B35, Dark theme (navy/slate), Status colors (green/yellow/red/blue)
 - **Typography**: Inter font family, consistent weight hierarchy (400/500/700)
 - **Components**: Pre-built cards, modals, forms, tables, badges, buttons with consistent styling
 - **Theme**: Dark theme primary with light mode toggle, responsive breakpoints
