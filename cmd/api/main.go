@@ -19,6 +19,7 @@ import (
 	zlog "github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 
+	"github.com/xerudro/DASHBOARD-v2/internal/avatar"
 	"github.com/xerudro/DASHBOARD-v2/internal/cache"
 	"github.com/xerudro/DASHBOARD-v2/internal/database"
 	"github.com/xerudro/DASHBOARD-v2/internal/handlers"
@@ -321,6 +322,9 @@ func (app *App) setupRoutes() {
 
 	// Static files
 	app.fiber.Static("/static", "./web/static")
+
+	// Avatar placeholder
+	app.fiber.Get("/api/avatar/:email", avatar.Handler)
 
 	// API routes
 	api := app.fiber.Group("/api/v1")

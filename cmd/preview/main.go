@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/xerudro/DASHBOARD-v2/internal/avatar"
 	"github.com/xerudro/DASHBOARD-v2/internal/models"
 	"github.com/xerudro/DASHBOARD-v2/web/templates/pages"
 )
@@ -12,8 +13,8 @@ import (
 func main() {
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
-		ServerHeader: "HostPanel-Preview",
-		AppName:      "HostPanel Preview v1.0",
+		ServerHeader: "VIP-Super-Hosting-Preview",
+		AppName:      "VIP Super Hosting Preview v1.0",
 	})
 
 	app.Use(logger.New())
@@ -21,12 +22,15 @@ func main() {
 	// Serve static files
 	app.Static("/static", "./web/static")
 
+	// Avatar preview endpoint
+	app.Get("/api/avatar/:email", avatar.Handler)
+
 	// Dashboard preview route
 	app.Get("/", func(c *fiber.Ctx) error {
 		// Mock user data
 		user := &models.User{
 			Name:  "Romeo Alexandru Neacsu",
-			Email: "admin@hostpanel.com",
+			Email: "admin@superhosting.vip",
 			Role:  "Admin",
 		}
 
@@ -53,7 +57,7 @@ func main() {
 		// Mock user data
 		user := &models.User{
 			Name:  "Romeo Alexandru Neacsu",
-			Email: "admin@hostpanel.com",
+			Email: "admin@superhosting.vip",
 			Role:  "Admin",
 		}
 
@@ -80,7 +84,7 @@ func main() {
 		// Mock user data
 		user := &models.User{
 			Name:  "Romeo Alexandru Neacsu",
-			Email: "admin@hostpanel.com",
+			Email: "admin@superhosting.vip",
 			Role:  "Admin",
 		}
 
@@ -113,7 +117,7 @@ func main() {
 	})
 
 	// Start server on port 5502
-	log.Println("🚀 Preview server starting on http://localhost:5502")
+	log.Println("🚀 VIP Super Hosting preview server starting on http://localhost:5502")
 	log.Println("📱 Dashboard: http://localhost:5502")
 	if err := app.Listen(":5502"); err != nil {
 		log.Fatal("Server failed to start:", err)
