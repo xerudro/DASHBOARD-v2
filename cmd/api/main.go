@@ -66,12 +66,14 @@ type LogConfig struct {
 type Repositories struct {
 	User   *repository.UserRepository
 	Server *repository.ServerRepository
+	Tenant *repository.TenantRepository
 	// Add other repositories as needed
 }
 
 // Services holds all service instances
 type Services struct {
 	CacheInvalidation *services.CacheInvalidationService
+	Permission        *services.PermissionService
 }
 
 func main() {
@@ -204,6 +206,7 @@ func (app *App) initRepositories() {
 	app.repos = &Repositories{
 		User:   repository.NewUserRepository(app.db.PostgreSQL()),
 		Server: repository.NewServerRepository(app.db.PostgreSQL()),
+		Tenant: repository.NewTenantRepository(app.db.PostgreSQL()),
 	}
 
 	zlog.Info().Msg("Repositories initialized")
@@ -216,6 +219,7 @@ func (app *App) initServices() {
 
 	app.svcs = &Services{
 		CacheInvalidation: services.NewCacheInvalidationService(dashboardCache),
+		Permission:        services.NewPermissionService(app.repos.Tenant, nil),
 	}
 
 	zlog.Info().Msg("Services initialized")
@@ -349,7 +353,7 @@ func (app *App) setupRoutes() {
 	protected.Get("/dashboard/stats", dashboardHandler.GetStats)
 
 	// Server routes
-	serverHandler := handlers.NewServerHandler(app.repos.Server, app.svcs.CacheInvalidation)
+	serverHandler := handlers.NewServerHandler(app.repos.Server, app.svcs.CacheInvalidation, app.svcs.Permission)
 	servers := protected.Group("/servers")
 	servers.Get("/", serverHandler.List)
 	servers.Post("/", serverHandler.Create)

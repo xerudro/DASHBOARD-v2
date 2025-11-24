@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,12 +13,14 @@ import (
 	"github.com/xerudro/DASHBOARD-v2/internal/middleware"
 	"github.com/xerudro/DASHBOARD-v2/internal/models"
 	"github.com/xerudro/DASHBOARD-v2/internal/repository"
+	"github.com/xerudro/DASHBOARD-v2/internal/services"
 )
 
 // ServerHandler handles server endpoints
 type ServerHandler struct {
 	serverRepo        *repository.ServerRepository
 	cacheInvalidation CacheInvalidationService
+	permissionChecker services.PermissionChecker
 }
 
 // CacheInvalidationService interface for cache invalidation operations
@@ -25,20 +28,23 @@ type CacheInvalidationService interface {
 	InvalidateServerCache(ctx context.Context, tenantID uuid.UUID, serverID *uuid.UUID) error
 }
 
+// PermissionChecker exposes server creation permission checks.
 // NewServerHandler creates a new server handler
-func NewServerHandler(serverRepo *repository.ServerRepository, cacheInvalidation CacheInvalidationService) *ServerHandler {
+func NewServerHandler(serverRepo *repository.ServerRepository, cacheInvalidation CacheInvalidationService, permissionChecker services.PermissionChecker) *ServerHandler {
 	return &ServerHandler{
 		serverRepo:        serverRepo,
 		cacheInvalidation: cacheInvalidation,
+		permissionChecker: permissionChecker,
 	}
 }
 
 // CreateServerRequest represents server creation request
 type CreateServerRequest struct {
-	Name     string `json:"name" validate:"required,min=2,max=50"`
-	Provider string `json:"provider" validate:"required,oneof=hetzner digitalocean vultr aws"`
-	Region   string `json:"region" validate:"required,min=2,max=20"`
-	Plan     string `json:"plan" validate:"required,min=2,max=50"`
+	Name        string `json:"name" validate:"required,min=2,max=50"`
+	Provider    string `json:"provider" validate:"required,oneof=hetzner digitalocean vultr aws"`
+	Region      string `json:"region" validate:"required,min=2,max=20"`
+	Plan        string `json:"plan" validate:"required,min=2,max=50"`
+	ServerClass string `json:"server_class" validate:"omitempty,oneof=vps dedicated"`
 }
 
 // ServerResponse represents server in API responses
@@ -138,7 +144,7 @@ func (h *ServerHandler) Get(c *fiber.Ctx) error {
 
 // Create creates a new server (API)
 func (h *ServerHandler) Create(c *fiber.Ctx) error {
-	userID, tenantID, _, _ := middleware.GetUserFromContext(c)
+	userID, tenantID, _, role := middleware.GetUserFromContext(c)
 
 	var req CreateServerRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -158,6 +164,33 @@ func (h *ServerHandler) Create(c *fiber.Ctx) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	serverClass := strings.ToLower(strings.TrimSpace(req.ServerClass))
+	if serverClass == "" {
+		serverClass = "vps"
+	}
+	if serverClass != "vps" && serverClass != "dedicated" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "Invalid server class",
+		})
+	}
+
+	allowed, err := h.permissionChecker.CanCreateServer(ctx, tenantID, role, serverClass)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to validate server creation permissions")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "Unable to validate permissions",
+		})
+	}
+
+	if !allowed {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error":   true,
+			"message": "Permission denied",
+		})
+	}
 
 	// Note: This is a simplified version. In production, you would:
 	// 1. Look up or create provider by name
@@ -404,31 +437,68 @@ func (h *ServerHandler) ServersPage(c *fiber.Ctx) error {
 		serversWithMetrics = []*models.ServerWithMetrics{} // Empty fallback
 	}
 
-	return c.Type("html").SendString(h.renderServersHTML(email, role, serversWithMetrics))
+	canVPS, _, permErr := h.evaluateServerCreation(ctx, tenantID, role)
+	if permErr != nil {
+		log.Warn().Err(permErr).Msg("Unable to evaluate server creation permissions")
+		canVPS = false
+	}
+
+	return c.Type("html").SendString(h.renderServersHTML(email, role, serversWithMetrics, canVPS))
 }
 
 // CreateServerPage renders server creation page (HTML)
 func (h *ServerHandler) CreateServerPage(c *fiber.Ctx) error {
-	_, _, email, role := middleware.GetUserFromContext(c)
+	_, tenantID, email, role := middleware.GetUserFromContext(c)
 
-	return c.Type("html").SendString(h.renderCreateServerHTML(email, role))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	canVPS, canDedicated, permErr := h.evaluateServerCreation(ctx, tenantID, role)
+	if permErr != nil {
+		log.Error().Err(permErr).Msg("Failed to evaluate server creation permissions")
+		return c.Status(fiber.StatusInternalServerError).SendString("Unable to evaluate permissions")
+	}
+
+	if !canVPS && !canDedicated {
+		return c.Status(fiber.StatusForbidden).SendString("You do not have permission to create servers. Please contact your administrator.")
+	}
+
+	return c.Type("html").SendString(h.renderCreateServerHTML(email, role, canDedicated))
 }
 
 // CreateServerForm handles server creation form (HTML)
 func (h *ServerHandler) CreateServerForm(c *fiber.Ctx) error {
-	userID, tenantID, _, _ := middleware.GetUserFromContext(c)
+	userID, tenantID, _, role := middleware.GetUserFromContext(c)
 
 	name := c.FormValue("name")
 	provider := c.FormValue("provider")
 	region := c.FormValue("region")
 	plan := c.FormValue("plan")
+	serverClass := strings.ToLower(strings.TrimSpace(c.FormValue("server_class")))
 
 	if name == "" || provider == "" || region == "" || plan == "" {
 		return c.Redirect("/servers/create?error=missing_fields")
 	}
 
+	if serverClass == "" {
+		serverClass = "vps"
+	}
+	if serverClass != "vps" && serverClass != "dedicated" {
+		return c.Redirect("/servers/create?error=invalid_class")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	allowed, err := h.permissionChecker.CanCreateServer(ctx, tenantID, role, serverClass)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to validate server creation permissions")
+		return c.Redirect("/servers/create?error=permission_check_failed")
+	}
+
+	if !allowed {
+		return c.Redirect("/servers/create?error=permission_denied")
+	}
 
 	// Note: This is a simplified version. In production, you would look up provider by name
 	providerID := uuid.MustParse("00000000-0000-0000-0000-000000000001") // Default/placeholder provider
@@ -453,23 +523,39 @@ func (h *ServerHandler) CreateServerForm(c *fiber.Ctx) error {
 		Str("server_id", server.ID.String()).
 		Str("user_id", userID.String()).
 		Str("name", server.Name).
+		Str("server_class", serverClass).
 		Msg("Server created via form")
 
 	return c.Redirect("/servers?success=server_created")
 }
 
+func (h *ServerHandler) evaluateServerCreation(ctx context.Context, tenantID uuid.UUID, role string) (bool, bool, error) {
+	canVPS, err := h.permissionChecker.CanCreateServer(ctx, tenantID, role, "vps")
+	if err != nil {
+		return false, false, err
+	}
+	canDedicated, err := h.permissionChecker.CanCreateServer(ctx, tenantID, role, "dedicated")
+	if err != nil {
+		return false, false, err
+	}
+	return canVPS, canDedicated, nil
+}
+
 // renderServersHTML renders the servers list page
-func (h *ServerHandler) renderServersHTML(email, role string, servers []*models.ServerWithMetrics) string {
+func (h *ServerHandler) renderServersHTML(email, role string, servers []*models.ServerWithMetrics, canCreate bool) string {
+	createAction := `<a href="/servers/create" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create Server</a>`
+	if !canCreate {
+		createAction = `<span class="bg-gray-200 text-gray-600 px-4 py-2 rounded">Server creation locked</span>`
+	}
+
 	serversSection := ""
 	if len(servers) == 0 {
-		serversSection = `
+		serversSection = fmt.Sprintf(`
 			<div class="text-center py-8">
 				<p class="text-gray-500">No servers found</p>
-				<a href="/servers/create" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-					Create Server
-				</a>
+				%s
 			</div>
-		`
+		`, createAction)
 	} else {
 		for _, swm := range servers {
 			region := "N/A"
@@ -508,151 +594,165 @@ func (h *ServerHandler) renderServersHTML(email, role string, servers []*models.
 <html>
 <head>
     <title>VIP Hosting Panel - Servers</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-semibold text-gray-900">VIP Hosting Panel</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-700">%s (%s)</span>
-                    <a href="/dashboard" class="text-blue-600 hover:text-blue-800">Dashboard</a>
-                    <a href="/logout" class="text-red-600 hover:text-red-800">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+	<!-- Navigation -->
+	<nav class="bg-white shadow-sm border-b">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex justify-between h-16">
+				<div class="flex items-center">
+					<h1 class="text-xl font-semibold text-gray-900">VIP Hosting Panel</h1>
+				</div>
+				<div class="flex items-center space-x-4">
+					<span class="text-sm text-gray-700">%s (%s)</span>
+					<a href="/dashboard" class="text-blue-600 hover:text-blue-800">Dashboard</a>
+					<a href="/logout" class="text-red-600 hover:text-red-800">Logout</a>
+			</div>
+		</div>
+		</div>
+	</nav>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Servers</h2>
-                <a href="/servers/create" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    Create Server
-                </a>
-            </div>
+	<!-- Main Content -->
+	<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+		<div class="px-4 py-6 sm:px-0">
+		<div class="flex justify-between items-center mb-6">
+			<h2 class="text-2xl font-bold text-gray-900">Servers</h2>
+			%s
+		</div>
             
-            <!-- Servers Table -->
-            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPU</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RAM</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disk</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" 
-                           hx-get="/api/v1/servers" 
-                           hx-trigger="every 30s"
-                           hx-swap="innerHTML">
-                        %s
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+			<!-- Servers Table -->
+			<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+				<table class="min-w-full divide-y divide-gray-200">
+					<thead class="bg-gray-50">
+						<tr>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPU</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RAM</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disk</th>
+						</tr>
+					</thead>
+					<tbody class="bg-white divide-y divide-gray-200" 
+						   hx-get="/api/v1/servers" 
+						   hx-trigger="every 30s"
+						   hx-swap="innerHTML">
+						%s
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
-	`, email, role, serversSection)
+	`, email, role, createAction, serversSection)
 }
 
 // renderCreateServerHTML renders the server creation form
-func (h *ServerHandler) renderCreateServerHTML(email, role string) string {
+func (h *ServerHandler) renderCreateServerHTML(email, role string, canDedicated bool) string {
+	dedicatedDisabled := ""
+	dedicatedHint := ""
+	if !canDedicated {
+		dedicatedDisabled = "disabled"
+		dedicatedHint = `<p class="text-sm text-gray-500 mt-2">Dedicated servers require an upgraded package. Contact your administrator.</p>`
+	}
 	return fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
 <head>
     <title>VIP Hosting Panel - Create Server</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-semibold text-gray-900">VIP Hosting Panel</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-700">%s (%s)</span>
-                    <a href="/dashboard" class="text-blue-600 hover:text-blue-800">Dashboard</a>
-                    <a href="/servers" class="text-blue-600 hover:text-blue-800">Servers</a>
-                    <a href="/logout" class="text-red-600 hover:text-red-800">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+	<!-- Navigation -->
+	<nav class="bg-white shadow-sm border-b">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex justify-between h-16">
+				<div class="flex items-center">
+					<h1 class="text-xl font-semibold text-gray-900">VIP Hosting Panel</h1>
+				</div>
+				<div class="flex items-center space-x-4">
+					<span class="text-sm text-gray-700">%s (%s)</span>
+					<a href="/dashboard" class="text-blue-600 hover:text-blue-800">Dashboard</a>
+					<a href="/servers" class="text-blue-600 hover:text-blue-800">Servers</a>
+					<a href="/logout" class="text-red-600 hover:text-red-800">Logout</a>
+				</div>
+			</div>
+		</div>
+	</nav>
 
-    <!-- Main Content -->
-    <div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Create Server</h2>
+	<!-- Main Content -->
+	<div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+		<div class="px-4 py-6 sm:px-0">
+			<h2 class="text-2xl font-bold text-gray-900 mb-6">Create Server</h2>
             
-            <div class="bg-white shadow rounded-lg p-6">
-                <form method="POST" action="/servers">
-                    <div class="grid grid-cols-1 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Server Name</label>
-                            <input type="text" name="name" required 
-                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+			<div class="bg-white shadow rounded-lg p-6">
+				<form method="POST" action="/servers">
+					<div class="grid grid-cols-1 gap-6">
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">Server Name</label>
+							<input type="text" name="name" required 
+								   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+						</div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Provider</label>
-                            <select name="provider" required 
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Select Provider</option>
-                                <option value="hetzner">Hetzner</option>
-                                <option value="digitalocean">DigitalOcean</option>
-                                <option value="vultr">Vultr</option>
-                                <option value="aws">AWS</option>
-                            </select>
-                        </div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">Provider</label>
+							<select name="provider" required 
+									class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+								<option value="">Select Provider</option>
+								<option value="hetzner">Hetzner</option>
+								<option value="digitalocean">DigitalOcean</option>
+								<option value="vultr">Vultr</option>
+								<option value="aws">AWS</option>
+							</select>
+						</div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Region</label>
-                            <input type="text" name="region" required placeholder="e.g., us-east-1, fra1"
-                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">Region</label>
+							<input type="text" name="region" required placeholder="e.g., us-east-1, fra1"
+								   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+						</div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Plan</label>
-                            <input type="text" name="plan" required placeholder="e.g., cx11, s-1vcpu-1gb"
-                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">Plan</label>
+							<input type="text" name="plan" required placeholder="e.g., cx11, s-1vcpu-1gb"
+								   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-2">Server Class</label>
+							<select name="server_class" required
+									class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+								<option value="vps">VPS Server</option>
+								<option value="dedicated" %s>Dedicated Server</option>
+							</select>
+							%s
+						</div>
+					</div>
                     
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <a href="/servers" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                            Cancel
-                        </a>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                            Create Server
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+					<div class="mt-6 flex justify-end space-x-3">
+						<a href="/servers" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+							Cancel
+						</a>
+						<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+							Create Server
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
-	`, email, role)
+	`, email, role, dedicatedDisabled, dedicatedHint)
 }
 
 // Helper function for status badge colors
