@@ -83,3 +83,4 @@ out/
 *.backup
 *.old
 nul
+.claude/settings.local.json

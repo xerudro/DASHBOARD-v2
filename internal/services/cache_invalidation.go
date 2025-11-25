@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,6 +30,72 @@ func (s *CacheInvalidationService) Set(ctx context.Context, key string, value in
 		return nil
 	}
 	return s.cache.Set(ctx, key, value, opts)
+}
+
+// Delete removes a value from cache (implements CacheService interface)
+func (s *CacheInvalidationService) Delete(ctx context.Context, key string) error {
+	if s.cache == nil {
+		return nil
+	}
+	return s.cache.Delete(ctx, key)
+}
+
+// DeleteByTag deletes cache entries by tag (implements CacheService interface)
+func (s *CacheInvalidationService) DeleteByTag(ctx context.Context, tag string) error {
+	if s.cache == nil {
+		return nil
+	}
+	return s.cache.DeleteByTag(ctx, tag)
+}
+
+// Exists checks if a key exists in cache (implements CacheService interface)
+func (s *CacheInvalidationService) Exists(ctx context.Context, key string) (bool, error) {
+	if s.cache == nil {
+		return false, nil
+	}
+	return s.cache.Exists(ctx, key)
+}
+
+// GetTTL returns the remaining TTL for a key (implements CacheService interface)
+func (s *CacheInvalidationService) GetTTL(ctx context.Context, key string) (time.Duration, error) {
+	if s.cache == nil {
+		return 0, nil
+	}
+	return s.cache.GetTTL(ctx, key)
+}
+
+// Refresh extends the TTL of a key (implements CacheService interface)
+func (s *CacheInvalidationService) Refresh(ctx context.Context, key string, ttl time.Duration) error {
+	if s.cache == nil {
+		return nil
+	}
+	return s.cache.Refresh(ctx, key, ttl)
+}
+
+// Clear removes all cache entries (implements CacheService interface)
+func (s *CacheInvalidationService) Clear(ctx context.Context) error {
+	if s.cache == nil {
+		return nil
+	}
+	return s.cache.Clear(ctx)
+}
+
+// GetOrSet retrieves or sets a cache value (implements CacheService interface)
+func (s *CacheInvalidationService) GetOrSet(ctx context.Context, key string, dest interface{}, fetchFunc func() (interface{}, error), opts ...cache.CacheOptions) error {
+	if s.cache == nil {
+		// If no cache, just fetch the data
+		value, err := fetchFunc()
+		if err != nil {
+			return err
+		}
+		// Copy value to dest (assuming it's a pointer to the same type)
+		data, err := json.Marshal(value)
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal(data, dest)
+	}
+	return s.cache.GetOrSet(ctx, key, dest, fetchFunc, opts...)
 }
 
 // NewCacheInvalidationService creates a new cache invalidation service

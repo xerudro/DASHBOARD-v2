@@ -30,7 +30,8 @@
       "Bash(timeout:*)",
       "Bash(taskkill:*)",
       "Bash(nul)",
-      "Bash(start /B go run:*)"
+      "Bash(start /B go run:*)",
+      "Bash(go work sync:*)"
     ],
     "deny": [],
     "ask": []

@@ -27,6 +27,7 @@ import (
 	"github.com/xerudro/DASHBOARD-v2/internal/monitoring"
 	"github.com/xerudro/DASHBOARD-v2/internal/repository"
 	"github.com/xerudro/DASHBOARD-v2/internal/services"
+	"github.com/xerudro/DASHBOARD-v2/internal/services/sites"
 )
 
 // App holds the application dependencies
@@ -67,6 +68,7 @@ type Repositories struct {
 	User   *repository.UserRepository
 	Server *repository.ServerRepository
 	Tenant *repository.TenantRepository
+	Site   *repository.SiteRepository
 	// Add other repositories as needed
 }
 
@@ -74,6 +76,7 @@ type Repositories struct {
 type Services struct {
 	CacheInvalidation *services.CacheInvalidationService
 	Permission        *services.PermissionService
+	SiteManager       *sites.SiteManager
 }
 
 func main() {
@@ -207,6 +210,7 @@ func (app *App) initRepositories() {
 		User:   repository.NewUserRepository(app.db.PostgreSQL()),
 		Server: repository.NewServerRepository(app.db.PostgreSQL()),
 		Tenant: repository.NewTenantRepository(app.db.PostgreSQL()),
+		Site:   repository.NewSiteRepository(app.db.PostgreSQL()),
 	}
 
 	zlog.Info().Msg("Repositories initialized")
@@ -217,9 +221,22 @@ func (app *App) initServices() {
 	// Initialize Redis cache for dashboard
 	dashboardCache := cache.NewRedisCache(app.db.Redis(), "dashboard:", 30*time.Second)
 
+	// Initialize site-specific services
+	deployer := sites.NewDeployer()
+	templateMgr := sites.NewTemplateManager()
+	siteManager := sites.NewSiteManager(
+		app.repos.Site,
+		app.repos.Server,
+		app.repos.Tenant,
+		deployer,
+		templateMgr,
+		dashboardCache,
+	)
+
 	app.svcs = &Services{
 		CacheInvalidation: services.NewCacheInvalidationService(dashboardCache),
 		Permission:        services.NewPermissionService(app.repos.Tenant, nil),
+		SiteManager:       siteManager,
 	}
 
 	zlog.Info().Msg("Services initialized")
@@ -368,6 +385,21 @@ func (app *App) setupRoutes() {
 	users.Get("/", userHandler.List)
 	users.Get("/profile", userHandler.GetProfile)
 	users.Put("/profile", userHandler.UpdateProfile)
+
+	// Site management routes
+	siteHandler := handlers.NewSiteHandler(app.svcs.SiteManager)
+	sitesGroup := protected.Group("/sites")
+	sitesGroup.Get("/", siteHandler.ListSites)
+	sitesGroup.Post("/", siteHandler.CreateSite)
+	sitesGroup.Get("/templates", siteHandler.ListTemplates)
+	sitesGroup.Get("/templates/:id", siteHandler.GetTemplate)
+	sitesGroup.Get("/types", siteHandler.GetSiteTypes)
+	sitesGroup.Post("/validate-domain", siteHandler.ValidateDomain)
+	sitesGroup.Get("/:id", siteHandler.GetSite)
+	sitesGroup.Put("/:id", siteHandler.UpdateSite)
+	sitesGroup.Delete("/:id", siteHandler.DeleteSite)
+	sitesGroup.Post("/:id/redeploy", siteHandler.RedeploySite)
+	sitesGroup.Get("/:id/metrics", siteHandler.GetSiteMetrics)
 
 	// Web routes (HTML responses)
 	web := app.fiber.Group("/")

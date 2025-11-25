@@ -10,36 +10,36 @@ import (
 
 // Site represents a hosted website
 type Site struct {
-	ID            uuid.UUID   `json:"id" db:"id"`
-	TenantID      uuid.UUID   `json:"tenant_id" db:"tenant_id"`
-	ServerID      uuid.UUID   `json:"server_id" db:"server_id"`
-	Name          string      `json:"name" db:"name"`
-	Domain        string      `json:"domain" db:"domain"`
-	Type          string      `json:"type" db:"type"`
-	PHPVersion    *string     `json:"php_version,omitempty" db:"php_version"`
-	NodeJSVersion *string     `json:"nodejs_version,omitempty" db:"nodejs_version"`
-	Webserver     string      `json:"webserver" db:"webserver"`
-	RootPath      *string     `json:"root_path,omitempty" db:"root_path"`
-	Status        string      `json:"status" db:"status"`
-	GitRepo       *string     `json:"git_repo,omitempty" db:"git_repo"`
-	GitBranch     *string     `json:"git_branch,omitempty" db:"git_branch"`
-	SSLEnabled    bool        `json:"ssl_enabled" db:"ssl_enabled"`
-	SSLAutoRenew  bool        `json:"ssl_auto_renew" db:"ssl_auto_renew"`
-	Config        SiteConfig  `json:"config,omitempty" db:"config"`
-	CreatedAt     time.Time   `json:"created_at" db:"created_at"`
-	UpdatedAt     time.Time   `json:"updated_at" db:"updated_at"`
-	DeployedAt    *time.Time  `json:"deployed_at,omitempty" db:"deployed_at"`
-	DeletedAt     *time.Time  `json:"deleted_at,omitempty" db:"deleted_at"`
+	ID            uuid.UUID  `json:"id" db:"id"`
+	TenantID      uuid.UUID  `json:"tenant_id" db:"tenant_id"`
+	ServerID      uuid.UUID  `json:"server_id" db:"server_id"`
+	Name          string     `json:"name" db:"name"`
+	Domain        string     `json:"domain" db:"domain"`
+	Type          string     `json:"type" db:"type"`
+	PHPVersion    *string    `json:"php_version,omitempty" db:"php_version"`
+	NodeJSVersion *string    `json:"nodejs_version,omitempty" db:"nodejs_version"`
+	Webserver     string     `json:"webserver" db:"webserver"`
+	RootPath      *string    `json:"root_path,omitempty" db:"root_path"`
+	Status        string     `json:"status" db:"status"`
+	GitRepo       *string    `json:"git_repo,omitempty" db:"git_repo"`
+	GitBranch     *string    `json:"git_branch,omitempty" db:"git_branch"`
+	SSLEnabled    bool       `json:"ssl_enabled" db:"ssl_enabled"`
+	SSLAutoRenew  bool       `json:"ssl_auto_renew" db:"ssl_auto_renew"`
+	Config        SiteConfig `json:"config,omitempty" db:"config"`
+	CreatedAt     time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at" db:"updated_at"`
+	DeployedAt    *time.Time `json:"deployed_at,omitempty" db:"deployed_at"`
+	DeletedAt     *time.Time `json:"deleted_at,omitempty" db:"deleted_at"`
 }
 
 // SiteType constants
 const (
-	SiteTypePHP      = "php"
-	SiteTypeNodeJS   = "nodejs"
-	SiteTypeStatic   = "static"
-	SiteTypePython   = "python"
+	SiteTypePHP       = "php"
+	SiteTypeNodeJS    = "nodejs"
+	SiteTypeStatic    = "static"
+	SiteTypePython    = "python"
 	SiteTypeWordPress = "wordpress"
-	SiteTypeLaravel  = "laravel"
+	SiteTypeLaravel   = "laravel"
 )
 
 // SiteStatus constants
@@ -49,17 +49,18 @@ const (
 	SiteStatusActive    = "active"
 	SiteStatusSuspended = "suspended"
 	SiteStatusFailed    = "failed"
+	SiteStatusDeleting  = "deleting"
 )
 
 // SiteConfig represents site-specific configuration
 type SiteConfig struct {
-	CacheEnabled     bool              `json:"cache_enabled,omitempty"`
-	WAFEnabled       bool              `json:"waf_enabled,omitempty"`
-	CompressionEnabled bool            `json:"compression_enabled,omitempty"`
-	BasicAuthEnabled bool              `json:"basic_auth_enabled,omitempty"`
-	EnvVars          map[string]string `json:"env_vars,omitempty"`
-	CustomHeaders    map[string]string `json:"custom_headers,omitempty"`
-	Redirects        []Redirect        `json:"redirects,omitempty"`
+	CacheEnabled       bool              `json:"cache_enabled,omitempty"`
+	WAFEnabled         bool              `json:"waf_enabled,omitempty"`
+	CompressionEnabled bool              `json:"compression_enabled,omitempty"`
+	BasicAuthEnabled   bool              `json:"basic_auth_enabled,omitempty"`
+	EnvVars            map[string]string `json:"env_vars,omitempty"`
+	CustomHeaders      map[string]string `json:"custom_headers,omitempty"`
+	Redirects          []Redirect        `json:"redirects,omitempty"`
 }
 
 // Redirect represents a URL redirect rule
